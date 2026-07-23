@@ -1,0 +1,21 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# Never commit secrets
+gemini-api-key.txt
+.env
+.env.*
+!.env.example
