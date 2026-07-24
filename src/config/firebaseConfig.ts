@@ -15,18 +15,20 @@
 
 const env = import.meta.env;
 
+// NOTE: use `||` (not `??`) so that empty-string env vars — which is what
+// GitHub Actions injects when the optional VITE_FIREBASE_* secrets are unset —
+// fall back to the literal defaults below. `??` would keep the empty string.
 export const firebaseConfig = {
-  apiKey: env.VITE_FIREBASE_API_KEY ?? "AIzaSyB7Xc3Ymu7yqd_1eJnd9YLlkl6fl1_n5Ug",
+  apiKey: env.VITE_FIREBASE_API_KEY || "AIzaSyB7Xc3Ymu7yqd_1eJnd9YLlkl6fl1_n5Ug",
   authDomain:
-    env.VITE_FIREBASE_AUTH_DOMAIN ?? "dream-vacation-2026.firebaseapp.com",
-  projectId: env.VITE_FIREBASE_PROJECT_ID ?? "dream-vacation-2026",
+    env.VITE_FIREBASE_AUTH_DOMAIN || "dream-vacation-2026.firebaseapp.com",
+  projectId: env.VITE_FIREBASE_PROJECT_ID || "dream-vacation-2026",
   storageBucket:
-    env.VITE_FIREBASE_STORAGE_BUCKET ??
+    env.VITE_FIREBASE_STORAGE_BUCKET ||
     "dream-vacation-2026.firebasestorage.app",
-  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? "199519345519",
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || "199519345519",
   appId:
-    env.VITE_FIREBASE_APP_ID ??
-    "1:199519345519:web:ddd06a9ba55f407e7a269a",
+    env.VITE_FIREBASE_APP_ID || "1:199519345519:web:ddd06a9ba55f407e7a269a",
 };
 
 /** True when enough config is present to initialise Firebase. */
