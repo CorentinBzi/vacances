@@ -86,7 +86,7 @@ export function DestinationSlideshow({ proposal }: { proposal: Proposal }) {
 
   return (
     <div
-      className="relative mx-auto flex min-h-[60vh] w-full max-w-sm flex-col gap-2 overflow-hidden rounded-[2rem] border border-gray-800 bg-black/85 p-2 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.6)] backdrop-blur-sm"
+      className="relative mx-auto flex min-h-[60vh] w-full max-w-sm flex-col gap-2 overflow-hidden rounded-[2rem] border border-gray-800 bg-black/80 p-2 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.6)] backdrop-blur-sm"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -131,7 +131,7 @@ export function DestinationSlideshow({ proposal }: { proposal: Proposal }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 </>
               ) : (
-                <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-lagoon-500 via-cyan-500 to-sunset-500 text-white">
+                <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-azure via-[#3aa7db] to-gold text-white">
                   <ImageOff className="h-8 w-8 opacity-70" />
                   <span className="text-sm opacity-80">Pas de photo trouvée</span>
                 </div>

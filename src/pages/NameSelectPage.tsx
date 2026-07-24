@@ -49,10 +49,10 @@ export function NameSelectPage() {
 
   return (
     <GradientShell>
-      <h1 className="font-display text-3xl font-bold text-slate-900">
+      <h1 className="font-display text-3xl font-bold text-ink">
         Qui es-tu&nbsp;? 🧳
       </h1>
-      <p className="mt-1 text-sm text-slate-600">
+      <p className="mt-1 text-sm text-ink-soft">
         Choisis ton prénom pour rejoindre le voyage.
       </p>
 
@@ -67,19 +67,19 @@ export function NameSelectPage() {
               whileTap={{ scale: 0.96 }}
               className={`relative flex flex-col items-center gap-1 rounded-2xl border-2 p-4 transition ${
                 active
-                  ? "border-lagoon-500 bg-lagoon-500/10 shadow-lg shadow-lagoon-500/20"
-                  : "border-slate-200 bg-white/70 hover:border-lagoon-300"
+                  ? "border-azure bg-azure/10 shadow-lg shadow-azure/20"
+                  : "border-linen bg-white/70 hover:border-azure/50"
               }`}
             >
               <span className="text-3xl">{AVATAR[name]}</span>
-              <span className="font-semibold text-slate-800">{name}</span>
+              <span className="font-semibold text-ink">{name}</span>
               {taken[name] && (
-                <span className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-600">
+                <span className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-coral">
                   déjà configuré
                 </span>
               )}
               {active && (
-                <span className="absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full bg-lagoon-500 text-white">
+                <span className="absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full bg-azure text-white">
                   <Check className="h-3 w-3" />
                 </span>
               )}
@@ -89,7 +89,7 @@ export function NameSelectPage() {
       </div>
 
       {selected && taken[selected] && (
-        <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
+        <p className="mt-4 rounded-xl bg-gold/10 px-3 py-2 text-xs text-coral">
           ⚠️ {selected} a déjà un mot de passe. Continuer réinitialisera son mot
           de passe personnel.
         </p>

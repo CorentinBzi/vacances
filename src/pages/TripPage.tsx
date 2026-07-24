@@ -92,17 +92,17 @@ export function TripPage() {
     <AppLayout wide>
       <Link
         to="/"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-slate-800"
       >
         <ArrowLeft className="h-4 w-4" /> Tous les voyages
       </Link>
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="flex items-center gap-1.5 text-sm font-medium text-lagoon-600">
+          <p className="flex items-center gap-1.5 text-sm font-medium text-azure-deep">
             <Compass className="h-4 w-4" /> Planification
           </p>
-          <h1 className="font-display text-4xl font-bold text-slate-900">
+          <h1 className="font-display text-4xl font-bold text-ink">
             {trip?.name ?? "Voyage"}
           </h1>
         </div>
@@ -127,14 +127,14 @@ export function TripPage() {
           className="mt-8 rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg"
         >
           <div className="mb-5 flex items-center gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-2xl bg-lagoon-500/10 text-lagoon-600">
+            <span className="grid h-11 w-11 place-items-center rounded-2xl bg-azure/10 text-azure-deep">
               <CalendarClock className="h-6 w-6" />
             </span>
             <div>
-              <h2 className="font-display text-2xl font-bold text-slate-900">
+              <h2 className="font-display text-2xl font-bold text-ink">
                 Tes indisponibilités
               </h2>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-ink-soft">
                 Mi-octobre → fin décembre 2026. Marque les jours où tu ne peux
                 pas, on en déduit les meilleures dates pour tous.
               </p>
@@ -151,8 +151,8 @@ export function TripPage() {
           {/* Aggregated availability */}
           <section className="mt-8 rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg">
             <div className="mb-5 flex items-center gap-2">
-              <CalendarCheck2 className="h-5 w-5 text-emerald-600" />
-              <h2 className="font-display text-2xl font-bold text-slate-900">
+              <CalendarCheck2 className="h-5 w-5 text-azure" />
+              <h2 className="font-display text-2xl font-bold text-ink">
                 Calendrier des disponibilités
               </h2>
             </div>
@@ -162,8 +162,8 @@ export function TripPage() {
           {/* Proposals */}
           <section className="mt-10">
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-slate-900">
-                <Sparkles className="h-5 w-5 text-sunset-500" /> Voyages proposés
+              <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-ink">
+                <Sparkles className="h-5 w-5 text-coral" /> Voyages proposés
               </h2>
               <Link to={`/trip/${tripId}/new`}>
                 <Button variant="outline" size="sm">
@@ -173,8 +173,8 @@ export function TripPage() {
             </div>
 
             {proposals.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-slate-300 bg-white/50 p-12 text-center">
-                <p className="text-slate-500">
+              <div className="rounded-3xl border border-dashed border-linen bg-white/50 p-12 text-center">
+                <p className="text-ink-soft">
                   Aucune proposition pour l'instant. Sois le premier à imaginer
                   l'aventure ! 🌍
                 </p>

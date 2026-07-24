@@ -17,7 +17,7 @@ function fmt(dt?: string): string | null {
 export function Timeline({ items }: { items: ProposalItem[] }) {
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 p-10 text-center text-slate-400">
+      <div className="rounded-2xl border border-dashed border-linen p-10 text-center text-ink-soft">
         Aucune étape n'a été ajoutée à ce voyage.
       </div>
     );
@@ -38,7 +38,7 @@ export function Timeline({ items }: { items: ProposalItem[] }) {
               <Icon className="h-4 w-4" />
             </span>
 
-            <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+            <div className="rounded-2xl border border-linen bg-white p-4 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <span
@@ -46,22 +46,22 @@ export function Timeline({ items }: { items: ProposalItem[] }) {
                   >
                     {meta.label}
                   </span>
-                  <h4 className="mt-1.5 font-semibold text-slate-900">
+                  <h4 className="mt-1.5 font-semibold text-ink">
                     {item.title}
                   </h4>
                 </div>
                 {item.cost != null && (
-                  <span className="flex shrink-0 items-center gap-1 rounded-lg bg-slate-100 px-2 py-1 text-sm font-medium text-slate-600">
+                  <span className="flex shrink-0 items-center gap-1 rounded-lg bg-azure/10 px-2 py-1 text-sm font-medium text-ink-soft">
                     <Wallet className="h-3.5 w-3.5" /> {item.cost} €
                   </span>
                 )}
               </div>
 
               {item.description && (
-                <p className="mt-2 text-sm text-slate-500">{item.description}</p>
+                <p className="mt-2 text-sm text-ink-soft">{item.description}</p>
               )}
 
-              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-soft">
                 {start && (
                   <span className="flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />
@@ -84,7 +84,7 @@ export function Timeline({ items }: { items: ProposalItem[] }) {
                   href={item.bookingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-700"
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-ink/80"
                 >
                   <ExternalLink className="h-3.5 w-3.5" /> Réserver / voir
                 </a>

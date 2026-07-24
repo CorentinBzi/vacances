@@ -1,20 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {
-  ArrowLeft,
-  Loader2,
-  MapPinned,
-  Trash2,
-  Save,
-  GripVertical,
-} from "lucide-react";
+import { ArrowLeft, Loader2, MapPinned, Trash2, Save, GripVertical } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
+import { DateRangePicker } from "@/components/calendar/DateRangePicker";
 import { ItemForm } from "@/components/ItemForm";
 import { useAuth } from "@/context/AuthContext";
-import { AVAILABILITY_WINDOW } from "@/config/appConfig";
 import { ITEM_TYPES } from "@/lib/items";
 import { db, type Destination, type ProposalItem } from "@/lib/db";
 import type { PlaceResult } from "@/lib/api/places";
@@ -34,8 +27,8 @@ export function ProposalCreatePage() {
 
   const [destination, setDestination] = useState<Destination | null>(null);
   const [title, setTitle] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState<string | undefined>();
+  const [endDate, setEndDate] = useState<string | undefined>();
   const [items, setItems] = useState<ProposalItem[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -88,15 +81,18 @@ export function ProposalCreatePage() {
     <AppLayout>
       <Link
         to={`/trip/${tripId}`}
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink"
       >
         <ArrowLeft className="h-4 w-4" /> Retour au voyage
       </Link>
 
-      <h1 className="font-display text-4xl font-bold text-slate-900">
+      <p className="text-sm font-bold uppercase tracking-[0.2em] text-coral">
+        Nouvelle proposition
+      </p>
+      <h1 className="mt-1 font-display text-4xl font-extrabold text-ink">
         Proposer un voyage ✨
       </h1>
-      <p className="mt-1 text-slate-500">
+      <p className="mt-1 text-ink-soft">
         Choisis une destination, ajoute les étapes (transport, logement,
         activités…) — ta proposition sera visible par toute la bande.
       </p>
@@ -104,9 +100,9 @@ export function ProposalCreatePage() {
       <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         {/* Left: builder */}
         <div className="space-y-6">
-          <section className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg">
-            <h2 className="mb-4 flex items-center gap-2 font-display text-xl font-bold text-slate-900">
-              <MapPinned className="h-5 w-5 text-lagoon-500" /> Destination
+          <section className="relative z-30 rounded-3xl border border-linen bg-card/80 p-6 shadow-lg shadow-azure/5 backdrop-blur">
+            <h2 className="mb-4 flex items-center gap-2 font-display text-xl font-bold text-ink">
+              <MapPinned className="h-5 w-5 text-azure" /> Destination
             </h2>
             <PlaceSearchInput
               value={destination?.name}
@@ -115,14 +111,14 @@ export function ProposalCreatePage() {
               onClear={() => setDestination(null)}
             />
             {destination && (
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-ink-soft">
                 📍 {destination.displayName}
               </p>
             )}
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <label className="block sm:col-span-2">
-                <span className="mb-1 block text-xs font-medium text-slate-500">
+                <span className="mb-1 block text-xs font-medium text-ink-soft">
                   Titre de la proposition
                 </span>
                 <Input
@@ -131,35 +127,24 @@ export function ProposalCreatePage() {
                   placeholder="Ex. Roadtrip surf au Portugal"
                 />
               </label>
-              <label className="block">
-                <span className="mb-1 block text-xs font-medium text-slate-500">
-                  Date de début
+              <div className="sm:col-span-2">
+                <span className="mb-1 block text-xs font-medium text-ink-soft">
+                  Dates du voyage (optionnel)
                 </span>
-                <Input
-                  type="date"
-                  min={AVAILABILITY_WINDOW.start}
-                  max={AVAILABILITY_WINDOW.end}
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                <DateRangePicker
+                  start={startDate}
+                  end={endDate}
+                  onChange={(s, e) => {
+                    setStartDate(s);
+                    setEndDate(e);
+                  }}
                 />
-              </label>
-              <label className="block">
-                <span className="mb-1 block text-xs font-medium text-slate-500">
-                  Date de fin
-                </span>
-                <Input
-                  type="date"
-                  min={startDate || AVAILABILITY_WINDOW.start}
-                  max={AVAILABILITY_WINDOW.end}
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </label>
+              </div>
             </div>
           </section>
 
-          <section className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg">
-            <h2 className="mb-4 font-display text-xl font-bold text-slate-900">
+          <section className="rounded-3xl border border-linen bg-card/80 p-6 shadow-lg shadow-azure/5 backdrop-blur">
+            <h2 className="mb-4 font-display text-xl font-bold text-ink">
               Ajouter une étape
             </h2>
             <ItemForm
@@ -171,18 +156,18 @@ export function ProposalCreatePage() {
 
         {/* Right: itinerary preview */}
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <section className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg">
+          <section className="rounded-3xl border border-linen bg-card/80 p-6 shadow-lg shadow-azure/5 backdrop-blur">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-display text-xl font-bold text-slate-900">
+              <h2 className="font-display text-xl font-bold text-ink">
                 Ton itinéraire
               </h2>
-              <span className="text-sm text-slate-400">
+              <span className="text-sm text-ink-soft">
                 {items.length} étape(s)
               </span>
             </div>
 
             {sorted.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-400">
+              <p className="rounded-2xl border border-dashed border-linen p-8 text-center text-sm text-ink-soft">
                 Ajoute des étapes pour construire le voyage.
               </p>
             ) : (
@@ -193,19 +178,19 @@ export function ProposalCreatePage() {
                   return (
                     <li
                       key={it.id}
-                      className="flex items-start gap-3 rounded-xl border border-slate-100 bg-white p-3"
+                      className="flex items-start gap-3 rounded-xl border border-linen bg-white p-3"
                     >
-                      <GripVertical className="mt-1 h-4 w-4 shrink-0 text-slate-300" />
+                      <GripVertical className="mt-1 h-4 w-4 shrink-0 text-ink-soft/40" />
                       <span
                         className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${meta.color}`}
                       >
                         <Icon className="h-4 w-4" />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-slate-800">
+                        <p className="truncate text-sm font-semibold text-ink">
                           {it.title}
                         </p>
-                        <p className="truncate text-xs text-slate-400">
+                        <p className="truncate text-xs text-ink-soft">
                           {it.startDateTime
                             ? new Date(it.startDateTime).toLocaleString("fr-FR", {
                                 dateStyle: "medium",
@@ -219,7 +204,7 @@ export function ProposalCreatePage() {
                         onClick={() =>
                           setItems((prev) => prev.filter((x) => x.id !== it.id))
                         }
-                        className="rounded-lg p-1 text-slate-400 hover:bg-rose-50 hover:text-rose-500"
+                        className="rounded-lg p-1 text-ink-soft/60 hover:bg-coral/10 hover:text-coral"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -230,13 +215,13 @@ export function ProposalCreatePage() {
             )}
 
             {total > 0 && (
-              <p className="mt-3 text-right text-sm font-semibold text-slate-600">
+              <p className="mt-3 text-right text-sm font-semibold text-ink">
                 Total estimé : {total} €
               </p>
             )}
 
             {error && (
-              <p className="mt-4 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">
+              <p className="mt-4 rounded-xl bg-coral/10 px-3 py-2 text-sm text-coral">
                 {error}
               </p>
             )}

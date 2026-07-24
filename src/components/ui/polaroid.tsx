@@ -32,7 +32,7 @@ export function Polaroid({
       )}
       style={style}
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm bg-gradient-to-br from-lagoon-400 to-sunset-400">
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm bg-gradient-to-br from-azure to-gold">
         {!failed ? (
           <img
             src={src}
@@ -47,7 +47,7 @@ export function Polaroid({
           </div>
         )}
       </div>
-      <figcaption className="pt-2 text-center font-display text-sm italic text-slate-700">
+      <figcaption className="pt-2 text-center font-serif text-base italic text-ink">
         {caption}
       </figcaption>
     </figure>

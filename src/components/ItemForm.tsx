@@ -70,7 +70,7 @@ export function ItemForm({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
+    <div className="rounded-2xl border border-linen bg-white/80 p-4">
       {/* Type chips */}
       <div className="flex flex-wrap gap-2">
         {ITEM_TYPE_LIST.map((meta) => {
@@ -84,7 +84,7 @@ export function ItemForm({
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ring-1 transition",
                 active
-                  ? "bg-slate-900 text-white ring-slate-900"
+                  ? "bg-ink text-white ring-ink"
                   : cn(meta.color, meta.ring, "hover:brightness-95")
               )}
             >
@@ -96,7 +96,7 @@ export function ItemForm({
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <label className="block sm:col-span-2">
-          <span className="mb-1 block text-xs font-medium text-slate-500">
+          <span className="mb-1 block text-xs font-medium text-ink-soft">
             Titre de l'étape *
           </span>
           <Input
@@ -107,7 +107,7 @@ export function ItemForm({
         </label>
 
         <div className="sm:col-span-2">
-          <span className="mb-1 block text-xs font-medium text-slate-500">
+          <span className="mb-1 block text-xs font-medium text-ink-soft">
             Lieu (optionnel)
           </span>
           <PlaceSearchInput
@@ -127,7 +127,7 @@ export function ItemForm({
         </div>
 
         <label className="block">
-          <span className="mb-1 block text-xs font-medium text-slate-500">
+          <span className="mb-1 block text-xs font-medium text-ink-soft">
             Début
           </span>
           <Input
@@ -140,7 +140,7 @@ export function ItemForm({
         </label>
 
         <label className="block">
-          <span className="mb-1 block text-xs font-medium text-slate-500">
+          <span className="mb-1 block text-xs font-medium text-ink-soft">
             Fin (optionnel)
           </span>
           <Input
@@ -153,7 +153,7 @@ export function ItemForm({
         </label>
 
         <label className="block">
-          <span className="mb-1 block text-xs font-medium text-slate-500">
+          <span className="mb-1 block text-xs font-medium text-ink-soft">
             Coût estimé (€, optionnel)
           </span>
           <Input
@@ -166,11 +166,11 @@ export function ItemForm({
         </label>
 
         <label className="block">
-          <span className="mb-1 block text-xs font-medium text-slate-500">
+          <span className="mb-1 block text-xs font-medium text-ink-soft">
             Lien de réservation
           </span>
           <div className="relative">
-            <LinkIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <LinkIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft/60" />
             <Input
               value={bookingTouched ? draft.bookingUrl : suggestedBooking}
               onChange={(e) => {
@@ -184,7 +184,7 @@ export function ItemForm({
         </label>
 
         <label className="block sm:col-span-2">
-          <span className="mb-1 block text-xs font-medium text-slate-500">
+          <span className="mb-1 block text-xs font-medium text-ink-soft">
             Note (optionnel)
           </span>
           <Input
@@ -196,7 +196,7 @@ export function ItemForm({
       </div>
 
       <div className="mt-4 flex items-center justify-between">
-        <span className="flex items-center gap-1 text-xs text-slate-400">
+        <span className="flex items-center gap-1 text-xs text-ink-soft">
           <Sparkles className="h-3.5 w-3.5" /> Le lien est pré-rempli selon le
           type — tu peux le remplacer.
         </span>

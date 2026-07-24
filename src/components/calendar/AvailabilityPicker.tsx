@@ -48,10 +48,10 @@ export function AvailabilityPicker({
               type="button"
               onClick={() => toggle(iso)}
               className={cn(
-                "flex h-9 w-full items-center justify-center rounded-lg text-sm font-medium transition",
+                "flex h-9 w-full items-center justify-center rounded-xl text-sm font-semibold transition",
                 off
-                  ? "bg-rose-500 text-white shadow-sm hover:bg-rose-600"
-                  : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                  ? "bg-gradient-to-br from-coral to-gold text-white shadow-sm shadow-coral/25"
+                  : "bg-azure/10 text-azure-deep hover:bg-azure/20"
               )}
               title={off ? "Indisponible — cliquer pour rendre dispo" : "Disponible — cliquer pour marquer indispo"}
             >
@@ -61,14 +61,14 @@ export function AvailabilityPicker({
         }}
       />
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white/80 p-4 ring-1 ring-slate-100">
-        <div className="flex items-center gap-4 text-sm">
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/70 bg-white/70 p-4 backdrop-blur">
+        <div className="flex items-center gap-4 text-sm text-ink-soft">
           <span className="flex items-center gap-1.5">
-            <span className="h-3.5 w-3.5 rounded bg-emerald-100 ring-1 ring-emerald-300" />
+            <span className="h-3.5 w-3.5 rounded bg-azure/20 ring-1 ring-azure/30" />
             Disponible
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-3.5 w-3.5 rounded bg-rose-500" />
+            <span className="h-3.5 w-3.5 rounded bg-gradient-to-br from-coral to-gold" />
             Indisponible ({unavailable.size})
           </span>
         </div>
@@ -89,10 +89,10 @@ export function AvailabilityPicker({
         </Button>
       </div>
 
-      <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-400">
+      <p className="mt-3 flex items-center gap-1.5 text-xs text-ink-soft/70">
         <CalendarX2 className="h-3.5 w-3.5" />
-        Astuce : marque en rouge les jours où tu ne peux pas. Tu pourras
-        modifier plus tard.
+        Astuce : colore les jours où tu ne peux pas. Tu pourras modifier plus
+        tard.
       </p>
     </div>
   );

@@ -43,24 +43,24 @@ export function ChangePasswordPage() {
 
   return (
     <GradientShell>
-      <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-lagoon-500/10 px-3 py-1 text-sm font-medium text-lagoon-600">
+      <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-azure/10 px-3 py-1 text-sm font-medium text-azure-deep">
         <ShieldCheck className="h-4 w-4" /> Salut {name} 👋
       </div>
-      <h1 className="font-display text-3xl font-bold text-slate-900">
+      <h1 className="font-display text-3xl font-bold text-ink">
         Crée ton mot de passe
       </h1>
-      <p className="mt-1 text-sm text-slate-600">
+      <p className="mt-1 text-sm text-ink-soft">
         Choisis un mot de passe personnel pour te reconnecter plus tard avec ton
         prénom.
       </p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <label className="block">
-          <span className="mb-1.5 block text-sm font-medium text-slate-700">
+          <span className="mb-1.5 block text-sm font-medium text-ink">
             Nouveau mot de passe
           </span>
           <div className="relative">
-            <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft/60" />
             <Input
               type="password"
               value={pw}
@@ -73,11 +73,11 @@ export function ChangePasswordPage() {
         </label>
 
         <label className="block">
-          <span className="mb-1.5 block text-sm font-medium text-slate-700">
+          <span className="mb-1.5 block text-sm font-medium text-ink">
             Confirme le mot de passe
           </span>
           <div className="relative">
-            <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft/60" />
             <Input
               type="password"
               value={confirm}
@@ -90,7 +90,7 @@ export function ChangePasswordPage() {
         </label>
 
         {error && (
-          <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">
+          <p className="rounded-xl bg-coral/10 px-3 py-2 text-sm text-coral">
             {error}
           </p>
         )}

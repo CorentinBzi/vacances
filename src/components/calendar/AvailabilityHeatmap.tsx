@@ -13,13 +13,14 @@ import {
 import { cn } from "@/lib/utils";
 
 function heatClass(availableCount: number, submitted: number): string {
-  if (submitted === 0) return "bg-slate-100 text-slate-400";
+  if (submitted === 0) return "bg-white/50 text-ink-soft/50";
   const ratio = availableCount / submitted;
-  if (ratio === 1) return "bg-emerald-500 text-white ring-1 ring-emerald-600";
-  if (ratio >= 0.75) return "bg-emerald-200 text-emerald-800";
-  if (ratio >= 0.5) return "bg-amber-200 text-amber-800";
-  if (ratio > 0) return "bg-orange-200 text-orange-800";
-  return "bg-rose-200 text-rose-800";
+  if (ratio === 1)
+    return "bg-gradient-to-br from-azure to-gold text-white shadow-sm shadow-azure/20";
+  if (ratio >= 0.75) return "bg-azure/25 text-azure-deep";
+  if (ratio >= 0.5) return "bg-gold/25 text-ink";
+  if (ratio > 0) return "bg-coral/20 text-coral";
+  return "bg-coral/25 text-coral";
 }
 
 export function AvailabilityHeatmap({ rows }: { rows: AvailabilityRow[] }) {
@@ -40,26 +41,26 @@ export function AvailabilityHeatmap({ rows }: { rows: AvailabilityRow[] }) {
   return (
     <div>
       {/* Best windows */}
-      <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
-        <div className="flex items-center gap-2 font-semibold text-emerald-800">
-          <Trophy className="h-5 w-5" /> Meilleures fenêtres (tout le monde
-          dispo)
+      <div className="mb-6 rounded-2xl border border-azure/20 bg-azure/5 p-4">
+        <div className="flex items-center gap-2 font-display font-bold text-azure-deep">
+          <Trophy className="h-5 w-5 text-gold" /> Meilleures fenêtres (tout le
+          monde dispo)
         </div>
         {submittedCount === 0 ? (
-          <p className="mt-2 text-sm text-emerald-700/80">
+          <p className="mt-2 text-sm text-ink-soft">
             Personne n'a encore renseigné ses disponibilités.
           </p>
         ) : bestWindows.length === 0 ? (
-          <p className="mt-2 text-sm text-emerald-700/80">
-            Aucune date ne convient à tout le monde pour l'instant — vise les
-            jours les plus verts ci-dessous.
+          <p className="mt-2 text-sm text-ink-soft">
+            Aucune date ne convient à tout le monde pour l'instant — visez les
+            jours les plus bleus ci-dessous.
           </p>
         ) : (
           <div className="mt-3 flex flex-wrap gap-2">
             {bestWindows.map((w) => (
               <span
                 key={w.start}
-                className="rounded-full bg-white px-3 py-1.5 text-sm font-medium text-emerald-700 shadow-sm ring-1 ring-emerald-200"
+                className="rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-azure-deep shadow-sm ring-1 ring-azure/20"
               >
                 {w.length === 1
                   ? formatLongDate(w.start)
@@ -97,18 +98,19 @@ export function AvailabilityHeatmap({ rows }: { rows: AvailabilityRow[] }) {
       />
 
       {/* Legend */}
-      <div className="mt-5 flex flex-wrap items-center gap-4 text-xs text-slate-500">
+      <div className="mt-5 flex flex-wrap items-center gap-4 text-xs text-ink-soft">
         <span className="flex items-center gap-1.5">
           <Users className="h-3.5 w-3.5" /> {submittedCount} participant(s)
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-3.5 w-3.5 rounded bg-emerald-500" /> Tous dispo
+          <span className="h-3.5 w-3.5 rounded bg-gradient-to-br from-azure to-gold" />{" "}
+          Tous dispo
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-3.5 w-3.5 rounded bg-amber-200" /> Moitié
+          <span className="h-3.5 w-3.5 rounded bg-gold/25" /> Moitié
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-3.5 w-3.5 rounded bg-rose-200" /> Peu / pas dispo
+          <span className="h-3.5 w-3.5 rounded bg-coral/25" /> Peu / pas dispo
         </span>
       </div>
     </div>

@@ -10,8 +10,8 @@ import { ProposalDetailPage } from "@/pages/ProposalDetailPage";
 
 function FullScreenLoader() {
   return (
-    <div className="flex h-screen items-center justify-center travel-gradient">
-      <div className="animate-pulse text-lg font-semibold text-white/90">
+    <div className="flex h-screen items-center justify-center bg-paper">
+      <div className="animate-pulse font-display text-lg font-semibold text-ink-soft">
         Chargement…
       </div>
     </div>

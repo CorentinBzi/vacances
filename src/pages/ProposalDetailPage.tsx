@@ -47,10 +47,10 @@ export function ProposalDetailPage() {
     return (
       <AppLayout>
         <div className="py-20 text-center">
-          <p className="text-slate-500">Cette proposition n'existe plus.</p>
+          <p className="text-ink-soft">Cette proposition n'existe plus.</p>
           <Link
             to={`/trip/${tripId}`}
-            className="mt-4 inline-flex items-center gap-1.5 text-lagoon-600 hover:underline"
+            className="mt-4 inline-flex items-center gap-1.5 text-azure-deep hover:underline"
           >
             <ArrowLeft className="h-4 w-4" /> Retour au voyage
           </Link>
@@ -67,7 +67,7 @@ export function ProposalDetailPage() {
     <AppLayout wide>
       <Link
         to={`/trip/${tripId}`}
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-slate-800"
       >
         <ArrowLeft className="h-4 w-4" /> Retour au voyage
       </Link>
@@ -75,12 +75,12 @@ export function ProposalDetailPage() {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-4xl font-bold text-slate-900">
+          <h1 className="font-display text-4xl font-bold text-ink">
             {proposal.title}
           </h1>
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink-soft">
             <span className="flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 text-lagoon-500" />
+              <MapPin className="h-4 w-4 text-azure" />
               {proposal.destination.displayName}
             </span>
             {proposal.startDate && (
@@ -106,10 +106,10 @@ export function ProposalDetailPage() {
           <button
             onClick={() => db.toggleVote(tripId, proposal.id, userName)}
             className={cn(
-              "flex items-center gap-2 rounded-2xl px-5 py-3 font-semibold shadow-sm transition",
+              "flex items-center gap-2 rounded-full px-5 py-3 font-semibold shadow-sm transition",
               hasVoted
-                ? "bg-rose-500 text-white shadow-rose-500/30"
-                : "bg-white text-rose-500 ring-1 ring-rose-200 hover:bg-rose-50"
+                ? "bg-coral text-white shadow-coral/30"
+                : "bg-white text-coral ring-1 ring-coral/25 hover:bg-coral/10"
             )}
           >
             <Heart className={cn("h-5 w-5", hasVoted && "fill-current")} />
@@ -126,11 +126,11 @@ export function ProposalDetailPage() {
           className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg"
         >
           <div className="mb-5 flex items-center justify-between">
-            <h2 className="font-display text-2xl font-bold text-slate-900">
+            <h2 className="font-display text-2xl font-bold text-ink">
               Itinéraire
             </h2>
             {total > 0 && (
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
+              <span className="rounded-full bg-azure/10 px-3 py-1 text-sm font-medium text-ink-soft">
                 Total estimé : {total} €
               </span>
             )}

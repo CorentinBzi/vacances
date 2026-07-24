@@ -45,34 +45,34 @@ export function CommentsPanel({
 
   return (
     <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg">
-      <h3 className="mb-4 flex items-center gap-2 font-display text-xl font-bold text-slate-900">
-        <MessageCircle className="h-5 w-5 text-lagoon-500" /> Commentaires
-        <span className="text-base font-normal text-slate-400">
+      <h3 className="mb-4 flex items-center gap-2 font-display text-xl font-bold text-ink">
+        <MessageCircle className="h-5 w-5 text-azure" /> Commentaires
+        <span className="text-base font-normal text-ink-soft">
           ({comments.length})
         </span>
       </h3>
 
       <div className="space-y-3">
         {ordered.length === 0 && (
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-ink-soft">
             Sois le premier à donner ton avis 💬
           </p>
         )}
         {ordered.map((c) => (
           <div key={c.id} className="flex gap-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-lagoon-400 to-sunset-400 text-sm font-bold text-white">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-azure to-gold text-sm font-bold text-white">
               {c.author.slice(0, 1).toUpperCase()}
             </span>
-            <div className="min-w-0 flex-1 rounded-2xl bg-slate-50 px-4 py-2.5">
+            <div className="min-w-0 flex-1 rounded-2xl bg-azure/5 px-4 py-2.5">
               <div className="flex items-baseline gap-2">
-                <span className="text-sm font-semibold text-slate-800">
+                <span className="text-sm font-semibold text-ink">
                   {c.author}
                 </span>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-ink-soft">
                   {timeAgo(c.createdAt)}
                 </span>
               </div>
-              <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-slate-600">
+              <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-ink-soft">
                 {c.text}
               </p>
             </div>
@@ -85,7 +85,7 @@ export function CommentsPanel({
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={`Commenter en tant que ${currentUser}…`}
-          className="h-11 flex-1 rounded-xl border border-slate-300/80 bg-white px-4 text-sm outline-none focus:border-lagoon-400 focus:ring-2 focus:ring-lagoon-400/40"
+          className="h-11 flex-1 rounded-xl border border-linen bg-white px-4 text-sm text-ink outline-none focus:border-azure focus:ring-2 focus:ring-azure/25"
         />
         <Button type="submit" disabled={sending || !text.trim()}>
           {sending ? (

@@ -35,7 +35,7 @@ export function WeatherBadge({
 
   if (loading) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-400">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/60 px-2.5 py-1 text-xs text-ink-soft/60">
         <Loader2 className="h-3 w-3 animate-spin" /> Météo…
       </span>
     );
@@ -43,7 +43,7 @@ export function WeatherBadge({
 
   if (!estimate) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-400">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/60 px-2.5 py-1 text-xs text-ink-soft/60">
         Météo indispo
       </span>
     );
@@ -53,7 +53,7 @@ export function WeatherBadge({
     return (
       <span
         title={`${estimate.label} · pluie ~${estimate.precipMm} mm/j`}
-        className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-700"
+        className="inline-flex items-center gap-1 rounded-full bg-azure/10 px-2.5 py-1 text-xs font-medium text-azure-deep"
       >
         {estimate.emoji} {estimate.tempMax}° / {estimate.tempMin}°
       </span>
@@ -61,13 +61,13 @@ export function WeatherBadge({
   }
 
   return (
-    <div className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-sky-100 to-cyan-50 px-3 py-2 ring-1 ring-sky-200">
+    <div className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-azure/10 to-gold/10 px-3 py-2 ring-1 ring-azure/20">
       <span className="text-2xl">{estimate.emoji}</span>
       <div className="leading-tight">
-        <div className="text-sm font-semibold text-slate-800">
+        <div className="text-sm font-semibold text-ink">
           {estimate.tempMax}° / {estimate.tempMin}°C
         </div>
-        <div className="text-xs text-slate-500">
+        <div className="text-xs text-ink-soft">
           {estimate.label} · ~{estimate.precipMm} mm pluie/j
         </div>
       </div>

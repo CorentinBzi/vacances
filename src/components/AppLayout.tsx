@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LogOut, Palmtree, ShieldCheck } from "lucide-react";
+import { SkyBackdrop } from "@/components/SkyBackdrop";
 import { useAuth } from "@/context/AuthContext";
 import { isAdmin } from "@/config/appConfig";
 import { usingSharedBackend } from "@/lib/db";
@@ -16,15 +17,16 @@ export function AppLayout({
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 via-sand to-orange-50/60">
-      <header className="sticky top-0 z-30 border-b border-white/60 bg-white/70 backdrop-blur-xl">
+    <div className="relative min-h-screen">
+      <SkyBackdrop />
+      <header className="sticky top-0 z-30 border-b border-white/60 bg-white/60 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-lagoon-500 to-sunset-500 text-white shadow-md">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-azure text-white shadow-md shadow-azure/25">
               <Palmtree className="h-5 w-5" />
             </span>
-            <span className="font-display text-lg font-bold text-slate-800">
-              Dream Vacation
+            <span className="font-display text-lg font-extrabold tracking-tight text-ink">
+              Dream Vacation<span className="text-coral">.</span>
             </span>
           </Link>
 
@@ -32,14 +34,14 @@ export function AppLayout({
             {!usingSharedBackend && (
               <span
                 title="Mode local : activez Firebase pour partager entre appareils."
-                className="hidden rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700 sm:inline"
+                className="hidden rounded-full bg-gold/20 px-3 py-1 text-xs font-medium text-coral sm:inline"
               >
                 💾 Mode local
               </span>
             )}
-            <span className="flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-200">
+            <span className="flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-sm font-semibold text-ink ring-1 ring-linen">
               {user && isAdmin(user.name) && (
-                <ShieldCheck className="h-4 w-4 text-lagoon-500" />
+                <ShieldCheck className="h-4 w-4 text-azure" />
               )}
               {user?.name}
             </span>
@@ -48,10 +50,10 @@ export function AppLayout({
                 logout();
                 navigate("/login", { replace: true });
               }}
-              className="grid h-9 w-9 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-rose-500"
+              className="grid h-9 w-9 place-items-center rounded-xl text-ink-soft transition hover:bg-white/70 hover:text-coral"
               title="Se déconnecter"
             >
-              <LogOut className="h-4.5 w-4.5" />
+              <LogOut className="h-[18px] w-[18px]" />
             </button>
           </div>
         </div>

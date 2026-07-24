@@ -14,64 +14,194 @@ body,
 
 body {
   margin: 0;
-  font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  background-color: #f4f9ff;
+  color: #14395c;
+  font-family: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #1f2937;
 }
 
-/* Travel-inspiring animated gradient used behind the login / onboarding screens. */
-.travel-gradient {
-  background: linear-gradient(
-    130deg,
-    #2563eb 0%,
-    #0ea5e9 22%,
-    #06b6d4 40%,
-    #14b8a6 55%,
-    #f59e0b 78%,
-    #f97316 100%
+::selection {
+  background: rgba(13, 124, 199, 0.22);
+}
+
+/* ── Fond « ciel d'été » : dégradé, soleil, nuages ─────────────────────── */
+
+.sky-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #d7ecfc 0%, #f4f9ff 55%, #fdf4e7 100%);
+}
+
+.sun-glow {
+  position: absolute;
+  right: -14vw;
+  top: -16vh;
+  width: 54vw;
+  height: 54vw;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 60% 40%,
+    rgba(242, 165, 65, 0.5),
+    rgba(242, 165, 65, 0.16) 45%,
+    transparent 70%
   );
-  background-size: 300% 300%;
-  animation: shimmer 18s ease infinite;
+  animation: sunPulse 14s ease-in-out infinite alternate;
 }
-
-@keyframes shimmer {
-  0% {
-    background-position: 0% 50%;
+@keyframes sunPulse {
+  from {
+    transform: scale(1);
+    opacity: 0.85;
   }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
+  to {
+    transform: scale(1.08);
+    opacity: 1;
   }
 }
 
-/* Soft frosted-glass card used across the app. */
-.glass {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+.cloud {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.5) 55%,
+    transparent 75%
+  );
+  animation: cloudDrift ease-in-out infinite alternate;
+}
+.cloud-a {
+  width: 44vw;
+  height: 12vw;
+  left: 2vw;
+  top: 14vh;
+  animation-duration: 36s;
+}
+.cloud-b {
+  width: 34vw;
+  height: 10vw;
+  right: 6vw;
+  top: 40vh;
+  opacity: 0.8;
+  animation-duration: 48s;
+  animation-delay: -14s;
+}
+.cloud-c {
+  width: 52vw;
+  height: 14vw;
+  left: 20vw;
+  bottom: 6vh;
+  opacity: 0.6;
+  animation-duration: 60s;
+  animation-delay: -30s;
+}
+@keyframes cloudDrift {
+  from {
+    transform: translateX(-4vw);
+  }
+  to {
+    transform: translateX(6vw);
+  }
 }
 
-.glass-dark {
-  background: rgba(17, 24, 39, 0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* ── Cadre « liquid glass » (cartes, calendrier) ───────────────────────── */
+/* In @layer components so Tailwind utilities (absolute, overflow…) can still
+   override, e.g. the date-picker popover that needs position: absolute. */
+@layer components {
+  .glass-card {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.72),
+      rgba(226, 240, 252, 0.5) 55%,
+      rgba(255, 255, 255, 0.66)
+    );
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      0 18px 44px -14px rgba(13, 58, 92, 0.28),
+      inset 0 1px 1px rgba(255, 255, 255, 0.95),
+      inset 0 0 22px rgba(255, 255, 255, 0.3);
+  }
+  /* Reflet spéculaire diagonal, comme la lumière sur du verre. */
+  .glass-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(
+      130deg,
+      rgba(255, 255, 255, 0.7) 0%,
+      rgba(255, 255, 255, 0.12) 22%,
+      transparent 42%,
+      transparent 74%,
+      rgba(255, 255, 255, 0.28) 100%
+    );
+    pointer-events: none;
+  }
 }
 
-/* Thin, unobtrusive scrollbars. */
+/* ── Entrées de page ────────────────────────────────────────────────────── */
+
+.reveal {
+  opacity: 0;
+  animation: fadeUp 0.85s cubic-bezier(0.22, 0.7, 0.25, 1) forwards;
+}
+.reveal-1 {
+  animation-delay: 0.05s;
+}
+.reveal-2 {
+  animation-delay: 0.18s;
+}
+.reveal-3 {
+  animation-delay: 0.32s;
+}
+.reveal-4 {
+  animation-delay: 0.46s;
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Thin scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(100, 116, 139, 0.4) transparent;
+  scrollbar-color: rgba(88, 116, 142, 0.35) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.4);
+  background: rgba(88, 116, 142, 0.35);
   border-radius: 999px;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .reveal {
+    opacity: 1;
+  }
 }
