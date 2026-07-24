@@ -13,7 +13,19 @@
       "Bash(npm run *)",
       "Bash(git init *)",
       "Bash(git add *)",
-      "Bash(git -c user.name=Coco -c user.email=corentin.bezille1756@gmail.com commit -q -m 'feat: Dream Vacation 2026 — planificateur de vacances entre amis *)"
+      "Bash(git -c user.name=Coco -c user.email=corentin.bezille1756@gmail.com commit -q -m 'feat: Dream Vacation 2026 — planificateur de vacances entre amis *)",
+      "Bash(gh repo *)",
+      "Bash(gh api *)",
+      "Bash(gh run *)",
+      "Bash(echo \"EXIT: $?\")",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "mcp__claude-in-chrome__navigate",
+      "mcp__claude-in-chrome__computer",
+      "mcp__claude-in-chrome__get_page_text",
+      "mcp__claude-in-chrome__read_page",
+      "mcp__claude-in-chrome__find",
+      "Bash(git -c user.name=Coco -c user.email=corentin.bezille1756@gmail.com commit -q -m 'feat: brancher la config Firebase \\(projet dream-vacation-2026\\) *)",
+      "Bash(git push *)"
     ]
   }
 }
