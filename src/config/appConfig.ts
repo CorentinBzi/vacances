@@ -33,6 +33,14 @@ export const AVAILABILITY_WINDOW = {
   end: "2026-12-31",
 } as const;
 
+// URL of the Cloudflare Worker that proxies Gemini (activity suggestions).
+// NOT a secret — just the Worker endpoint. Empty until deployed; the AI
+// suggestions UI stays hidden until this is set. Fill after `wrangler deploy`
+// (or via VITE_GEMINI_PROXY_URL at build time).
+export const GEMINI_PROXY_URL =
+  import.meta.env.VITE_GEMINI_PROXY_URL ||
+  "https://vacances-gemini.corentinbzi.workers.dev";
+
 export function isAdmin(name: string | null | undefined): boolean {
   return name === ADMIN_NAME;
 }

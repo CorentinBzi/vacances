@@ -1,0 +1,11 @@
+# Cloudflare Worker: secure Gemini proxy for activity suggestions.
+# The API key is NOT here — it's set as an encrypted secret:
+#   npx wrangler secret put GEMINI_API_KEY
+name = "vacances-gemini"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+[vars]
+GEMINI_MODEL = "gemini-3.1-flash-lite"
+# Comma-separated list of origins allowed to call this Worker.
+ALLOWED_ORIGINS = "https://corentinbzi.github.io,http://localhost:5173"

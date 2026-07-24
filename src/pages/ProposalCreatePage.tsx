@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { DateRangePicker } from "@/components/calendar/DateRangePicker";
 import { ItemForm } from "@/components/ItemForm";
+import { AiActivitySuggestions } from "@/components/AiActivitySuggestions";
 import { useAuth } from "@/context/AuthContext";
 import { ITEM_TYPES } from "@/lib/items";
 import { db, type Destination, type ProposalItem } from "@/lib/db";
@@ -142,6 +143,13 @@ export function ProposalCreatePage() {
               </div>
             </div>
           </section>
+
+          <AiActivitySuggestions
+            destination={destination}
+            startDate={startDate}
+            endDate={endDate}
+            onAdd={(item) => setItems((prev) => [...prev, item])}
+          />
 
           <section className="rounded-3xl border border-linen bg-card/80 p-6 shadow-lg shadow-azure/5 backdrop-blur">
             <h2 className="mb-4 font-display text-xl font-bold text-ink">
