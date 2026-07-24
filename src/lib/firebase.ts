@@ -1,5 +1,5 @@
 import { initializeApp, type FirebaseApp } from "firebase/app";
-import { getFirestore, type Firestore } from "firebase/firestore";
+import { initializeFirestore, type Firestore } from "firebase/firestore";
 import { getAuth, signInAnonymously } from "firebase/auth";
 import { firebaseConfig, isFirebaseConfigured } from "@/config/firebaseConfig";
 
@@ -8,7 +8,10 @@ let firestore: Firestore | null = null;
 
 if (isFirebaseConfigured) {
   app = initializeApp(firebaseConfig);
-  firestore = getFirestore(app);
+  // ignoreUndefinedProperties: proposals/items carry many optional fields left
+  // as `undefined`; Firestore rejects undefined values otherwise. This drops
+  // them silently (localStorage already ignored them via JSON.stringify).
+  firestore = initializeFirestore(app, { ignoreUndefinedProperties: true });
   // Sign in anonymously so Firestore rules can require an authenticated
   // session (request.auth != null). Harmless if Anonymous auth is disabled —
   // it just logs a warning and, with open rules, the app still works.
