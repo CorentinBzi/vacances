@@ -121,4 +121,13 @@ export interface Database {
     author: string,
     text: string
   ): Promise<void>;
+  updateProposal(
+    tripId: string,
+    proposalId: string,
+    patch: Pick<
+      Proposal,
+      "title" | "destination" | "startDate" | "endDate" | "items"
+    >
+  ): Promise<void>;
+  deleteProposal(tripId: string, proposalId: string): Promise<void>;
 }

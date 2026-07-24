@@ -27,9 +27,19 @@ export function PlaceSearchInput({
   const abortRef = useRef<AbortController | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => setText(value ?? ""), [value]);
+  // Skip the auto-search when the text is set programmatically (e.g. pre-filling
+  // in edit mode), so the dropdown doesn't pop open on its own.
+  const skipSearchRef = useRef(false);
+  useEffect(() => {
+    skipSearchRef.current = true;
+    setText(value ?? "");
+  }, [value]);
 
   useEffect(() => {
+    if (skipSearchRef.current) {
+      skipSearchRef.current = false;
+      return;
+    }
     if (text.trim().length < 2) {
       setResults([]);
       setLoading(false);

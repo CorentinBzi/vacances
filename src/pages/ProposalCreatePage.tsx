@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Loader2, MapPinned, Trash2, Save, GripVertical } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
@@ -9,6 +9,7 @@ import { DateRangePicker } from "@/components/calendar/DateRangePicker";
 import { ItemForm } from "@/components/ItemForm";
 import { AiActivitySuggestions } from "@/components/AiActivitySuggestions";
 import { useAuth } from "@/context/AuthContext";
+import { isAdmin } from "@/config/appConfig";
 import { ITEM_TYPES } from "@/lib/items";
 import { db, type Destination, type ProposalItem } from "@/lib/db";
 import type { PlaceResult } from "@/lib/api/places";
@@ -22,7 +23,8 @@ function sortItems(items: ProposalItem[]): ProposalItem[] {
 }
 
 export function ProposalCreatePage() {
-  const { tripId = "" } = useParams();
+  const { tripId = "", proposalId } = useParams();
+  const isEdit = Boolean(proposalId);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -33,6 +35,30 @@ export function ProposalCreatePage() {
   const [items, setItems] = useState<ProposalItem[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(!isEdit);
+  const initedRef = useRef(false);
+
+  // Edit mode: load the existing proposal once, enforce ownership, pre-fill.
+  useEffect(() => {
+    if (!isEdit) return;
+    return db.subscribeProposals(tripId, (list) => {
+      if (initedRef.current) return;
+      const p = list.find((x) => x.id === proposalId);
+      if (!p) return;
+      if (p.createdBy !== user?.name && !isAdmin(user?.name)) {
+        navigate(`/trip/${tripId}/proposal/${proposalId}`, { replace: true });
+        return;
+      }
+      initedRef.current = true;
+      setDestination(p.destination);
+      setTitle(p.title);
+      setStartDate(p.startDate);
+      setEndDate(p.endDate);
+      setItems(p.items);
+      setLoaded(true);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit, tripId, proposalId, user?.name]);
 
   function pickDestination(p: PlaceResult) {
     setDestination({
@@ -58,15 +84,26 @@ export function ProposalCreatePage() {
     if (!user) return;
     setSaving(true);
     try {
-      const proposal = await db.createProposal(tripId, {
-        title: title.trim(),
-        createdBy: user.name,
-        destination,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
-        items: sortItems(items),
-      });
-      navigate(`/trip/${tripId}/proposal/${proposal.id}`, { replace: true });
+      if (isEdit && proposalId) {
+        await db.updateProposal(tripId, proposalId, {
+          title: title.trim(),
+          destination,
+          startDate: startDate || undefined,
+          endDate: endDate || undefined,
+          items: sortItems(items),
+        });
+        navigate(`/trip/${tripId}/proposal/${proposalId}`, { replace: true });
+      } else {
+        const proposal = await db.createProposal(tripId, {
+          title: title.trim(),
+          createdBy: user.name,
+          destination,
+          startDate: startDate || undefined,
+          endDate: endDate || undefined,
+          items: sortItems(items),
+        });
+        navigate(`/trip/${tripId}/proposal/${proposal.id}`, { replace: true });
+      }
     } catch (err) {
       console.error(err);
       setError("Échec de l'enregistrement. Réessaie.");
@@ -78,20 +115,35 @@ export function ProposalCreatePage() {
   const sorted = sortItems(items);
   const total = items.reduce((sum, it) => sum + (it.cost ?? 0), 0);
 
+  if (isEdit && !loaded) {
+    return (
+      <AppLayout>
+        <div className="animate-pulse py-20 text-center text-ink-soft">
+          Chargement de la proposition…
+        </div>
+      </AppLayout>
+    );
+  }
+
+  const backTo = isEdit
+    ? `/trip/${tripId}/proposal/${proposalId}`
+    : `/trip/${tripId}`;
+
   return (
     <AppLayout>
       <Link
-        to={`/trip/${tripId}`}
+        to={backTo}
         className="mb-4 inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink"
       >
-        <ArrowLeft className="h-4 w-4" /> Retour au voyage
+        <ArrowLeft className="h-4 w-4" />{" "}
+        {isEdit ? "Retour à la proposition" : "Retour au voyage"}
       </Link>
 
       <p className="text-sm font-bold uppercase tracking-[0.2em] text-coral">
-        Nouvelle proposition
+        {isEdit ? "Édition" : "Nouvelle proposition"}
       </p>
       <h1 className="mt-1 font-display text-4xl font-extrabold text-ink">
-        Proposer un voyage ✨
+        {isEdit ? "Modifier la proposition ✏️" : "Proposer un voyage ✨"}
       </h1>
       <p className="mt-1 text-ink-soft">
         Choisis une destination, ajoute les étapes (transport, logement,
@@ -242,11 +294,13 @@ export function ProposalCreatePage() {
             >
               {saving ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Publication…
+                  <Loader2 className="h-4 w-4 animate-spin" />{" "}
+                  {isEdit ? "Enregistrement…" : "Publication…"}
                 </>
               ) : (
                 <>
-                  <Save className="h-4 w-4" /> Publier la proposition
+                  <Save className="h-4 w-4" />{" "}
+                  {isEdit ? "Enregistrer les modifications" : "Publier la proposition"}
                 </>
               )}
             </Button>

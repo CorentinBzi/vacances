@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { CalendarDays, Plus, X, Loader2, MapPin } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { DreamVacationIllustration } from "@/components/DreamVacationIllustration";
+import { GlobeWeather } from "@/components/ui/cobe-globe-weather";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
@@ -34,7 +35,17 @@ export function DashboardPage() {
 
   return (
     <AppLayout>
-      <div className="reveal reveal-1">
+      {/* Decorative travel globe behind the page — auto-rotating, non-interactive */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center overflow-hidden"
+      >
+        <div className="w-[min(92vw,720px)] translate-y-6 opacity-70 sm:opacity-[0.78]">
+          <GlobeWeather speed={0.0022} />
+        </div>
+      </div>
+
+      <div className="relative z-10 reveal reveal-1">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.22em] text-coral">

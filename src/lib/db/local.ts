@@ -202,4 +202,33 @@ export const localDb: Database = {
       )
     );
   },
+
+  async updateProposal(tripId, proposalId, patch) {
+    const k = key(`proposals:${tripId}`);
+    const list = read<Proposal[]>(k, []);
+    write(
+      k,
+      list.map((p) =>
+        p.id === proposalId
+          ? {
+              ...p,
+              title: patch.title,
+              destination: patch.destination,
+              items: patch.items,
+              startDate: patch.startDate,
+              endDate: patch.endDate,
+            }
+          : p
+      )
+    );
+  },
+
+  async deleteProposal(tripId, proposalId) {
+    const k = key(`proposals:${tripId}`);
+    const list = read<Proposal[]>(k, []);
+    write(
+      k,
+      list.filter((p) => p.id !== proposalId)
+    );
+  },
 };

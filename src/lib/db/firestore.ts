@@ -1,5 +1,7 @@
 import {
   collection,
+  deleteDoc,
+  deleteField,
   doc,
   getDoc,
   onSnapshot,
@@ -174,6 +176,21 @@ export function createFirestoreDb(db: Firestore): Database {
       await updateDoc(doc(propsCol(tripId), proposalId), {
         comments: arrayUnion(comment),
       });
+    },
+
+    async updateProposal(tripId, proposalId, patch) {
+      await updateDoc(doc(propsCol(tripId), proposalId), {
+        title: patch.title,
+        destination: patch.destination,
+        items: patch.items,
+        // deleteField clears dates that were removed during editing.
+        startDate: patch.startDate ?? deleteField(),
+        endDate: patch.endDate ?? deleteField(),
+      });
+    },
+
+    async deleteProposal(tripId, proposalId) {
+      await deleteDoc(doc(propsCol(tripId), proposalId));
     },
   };
 }

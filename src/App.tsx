@@ -89,6 +89,14 @@ export default function App() {
         }
       />
       <Route
+        path="/trip/:tripId/proposal/:proposalId/edit"
+        element={
+          <RequireAuth>
+            <ProposalCreatePage />
+          </RequireAuth>
+        }
+      />
+      <Route
         path="/trip/:tripId/proposal/:proposalId"
         element={
           <RequireAuth>
