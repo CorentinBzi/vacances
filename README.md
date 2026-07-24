@@ -76,12 +76,19 @@ Le déploiement est **automatique** via GitHub Actions à chaque push sur `main`
 
 ---
 
-## 🔗 Activer le partage entre appareils (Firebase — recommandé)
+## 🔗 Partage entre appareils (Firebase) — ✅ DÉJÀ CONFIGURÉ
 
-Par défaut, l'app fonctionne en **mode local** : les données restent dans le
-navigateur de chacun (pratique pour tester, mais **rien n'est partagé**). Pour
-que tout le monde voie les mêmes dispos, voyages, votes et commentaires en temps
-réel, branche **Firebase Firestore** (offre gratuite « Spark ») :
+> **C'est fait.** Le projet **`dream-vacation-2026`** (offre gratuite Spark) est
+> branché : Firestore (région `eur3` Europe), authentification anonyme activée,
+> et règles de sécurité publiées. Le site affiche « 🔗 Mode partagé » et les
+> données (dispos, voyages, votes, commentaires) sont synchronisées en temps réel
+> entre tous les appareils. La config est dans
+> [`src/config/firebaseConfig.ts`](src/config/firebaseConfig.ts).
+>
+> Console du projet : https://console.firebase.google.com/project/dream-vacation-2026
+
+La procédure ci-dessous est conservée **pour référence** (si tu dois recréer le
+projet un jour). Elle branche **Firebase Firestore** (offre gratuite « Spark ») :
 
 1. **Créer le projet** — https://console.firebase.google.com → *Ajouter un
    projet* (gratuit, sans carte bancaire).

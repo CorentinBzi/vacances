@@ -26,7 +26,8 @@
       "mcp__claude-in-chrome__find",
       "Bash(git -c user.name=Coco -c user.email=corentin.bezille1756@gmail.com commit -q -m 'feat: brancher la config Firebase \\(projet dream-vacation-2026\\) *)",
       "Bash(git push *)",
-      "Bash(curl -s \"https://corentinbzi.github.io/vacances/index.html?cb=$\\(date +%s%N\\)\")"
+      "Bash(curl -s \"https://corentinbzi.github.io/vacances/index.html?cb=$\\(date +%s%N\\)\")",
+      "Bash(git -c user.name=Coco -c user.email=corentin.bezille1756@gmail.com commit -q -m 'docs: Firebase configuré \\(projet dream-vacation-2026, mode partagé actif\\) *)"
     ]
   }
 }
