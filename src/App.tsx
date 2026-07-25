@@ -7,6 +7,7 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { TripPage } from "@/pages/TripPage";
 import { ProposalCreatePage } from "@/pages/ProposalCreatePage";
 import { ProposalDetailPage } from "@/pages/ProposalDetailPage";
+import { ExpensesPage } from "@/pages/ExpensesPage";
 
 function FullScreenLoader() {
   return (
@@ -85,6 +86,14 @@ export default function App() {
         element={
           <RequireAuth>
             <ProposalCreatePage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/trip/:tripId/depenses"
+        element={
+          <RequireAuth>
+            <ExpensesPage />
           </RequireAuth>
         }
       />

@@ -19,6 +19,7 @@ import type {
   Availability,
   Comment,
   Database,
+  Expense,
   Proposal,
   Trip,
   UserRecord,
@@ -37,6 +38,8 @@ export function createFirestoreDb(db: Firestore): Database {
     collection(db, "trips", tripId, "availability");
   const propsCol = (tripId: string) =>
     collection(db, "trips", tripId, "proposals");
+  const expCol = (tripId: string) =>
+    collection(db, "trips", tripId, "expenses");
 
   let seeded = false;
   async function seedDefaultTrip(): Promise<void> {
@@ -191,6 +194,60 @@ export function createFirestoreDb(db: Firestore): Database {
 
     async deleteProposal(tripId, proposalId) {
       await deleteDoc(doc(propsCol(tripId), proposalId));
+    },
+
+    async editComment(tripId, proposalId, commentId, text) {
+      const ref = doc(propsCol(tripId), proposalId);
+      await runTransaction(db, async (tx) => {
+        const snap = await tx.get(ref);
+        if (!snap.exists()) return;
+        const comments = ((snap.data().comments ?? []) as Comment[]).map((c) =>
+          c.id === commentId ? { ...c, text } : c
+        );
+        tx.update(ref, { comments });
+      });
+    },
+
+    async deleteComment(tripId, proposalId, commentId) {
+      const ref = doc(propsCol(tripId), proposalId);
+      await runTransaction(db, async (tx) => {
+        const snap = await tx.get(ref);
+        if (!snap.exists()) return;
+        const comments = ((snap.data().comments ?? []) as Comment[]).filter(
+          (c) => c.id !== commentId
+        );
+        tx.update(ref, { comments });
+      });
+    },
+
+    subscribeExpenses(tripId, cb) {
+      return onSnapshot(
+        query(expCol(tripId), orderBy("createdAt", "desc")),
+        (snap) => {
+          cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Expense));
+        }
+      );
+    },
+
+    async addExpense(tripId, expense) {
+      const id = randomId("exp");
+      await setDoc(doc(expCol(tripId), id), {
+        ...expense,
+        createdAt: Date.now(),
+      });
+    },
+
+    async updateExpense(tripId, expenseId, patch) {
+      await updateDoc(doc(expCol(tripId), expenseId), {
+        label: patch.label,
+        amount: patch.amount,
+        paidBy: patch.paidBy,
+        participants: patch.participants,
+      });
+    },
+
+    async deleteExpense(tripId, expenseId) {
+      await deleteDoc(doc(expCol(tripId), expenseId));
     },
   };
 }

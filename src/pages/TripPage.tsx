@@ -8,6 +8,7 @@ import {
   Compass,
   Plus,
   Sparkles,
+  Wallet,
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -108,6 +109,11 @@ export function TripPage() {
         </div>
         {!needsAvailability && (
           <div className="flex flex-wrap gap-2">
+            <Link to={`/trip/${tripId}/depenses`}>
+              <Button variant="outline">
+                <Wallet className="h-4 w-4" /> Dépenses
+              </Button>
+            </Link>
             <Button variant="outline" onClick={() => setEditing(true)}>
               <CalendarClock className="h-4 w-4" /> Modifier mes dispos
             </Button>

@@ -78,6 +78,19 @@ export interface Proposal {
   comments: Comment[];
 }
 
+/** A shared expense, split equally among its participants (Tricount-style). */
+export interface Expense {
+  id: string;
+  label: string;
+  amount: number;
+  /** userName who paid the full amount. */
+  paidBy: string;
+  /** userNames the expense is split equally among. */
+  participants: string[];
+  createdBy: string;
+  createdAt: number;
+}
+
 export type Unsubscribe = () => void;
 
 /** Unified data access contract implemented by both backends. */
@@ -130,4 +143,31 @@ export interface Database {
     >
   ): Promise<void>;
   deleteProposal(tripId: string, proposalId: string): Promise<void>;
+  editComment(
+    tripId: string,
+    proposalId: string,
+    commentId: string,
+    text: string
+  ): Promise<void>;
+  deleteComment(
+    tripId: string,
+    proposalId: string,
+    commentId: string
+  ): Promise<void>;
+
+  // Expenses (shared, per trip)
+  subscribeExpenses(
+    tripId: string,
+    cb: (expenses: Expense[]) => void
+  ): Unsubscribe;
+  addExpense(
+    tripId: string,
+    expense: Omit<Expense, "id" | "createdAt">
+  ): Promise<void>;
+  updateExpense(
+    tripId: string,
+    expenseId: string,
+    patch: Pick<Expense, "label" | "amount" | "paidBy" | "participants">
+  ): Promise<void>;
+  deleteExpense(tripId: string, expenseId: string): Promise<void>;
 }

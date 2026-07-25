@@ -4,6 +4,7 @@ import type {
   Availability,
   Comment,
   Database,
+  Expense,
   Proposal,
   Trip,
   Unsubscribe,
@@ -229,6 +230,84 @@ export const localDb: Database = {
     write(
       k,
       list.filter((p) => p.id !== proposalId)
+    );
+  },
+
+  async editComment(tripId, proposalId, commentId, text) {
+    const k = key(`proposals:${tripId}`);
+    const list = read<Proposal[]>(k, []);
+    write(
+      k,
+      list.map((p) =>
+        p.id === proposalId
+          ? {
+              ...p,
+              comments: p.comments.map((c) =>
+                c.id === commentId ? { ...c, text } : c
+              ),
+            }
+          : p
+      )
+    );
+  },
+
+  async deleteComment(tripId, proposalId, commentId) {
+    const k = key(`proposals:${tripId}`);
+    const list = read<Proposal[]>(k, []);
+    write(
+      k,
+      list.map((p) =>
+        p.id === proposalId
+          ? { ...p, comments: p.comments.filter((c) => c.id !== commentId) }
+          : p
+      )
+    );
+  },
+
+  subscribeExpenses(tripId, cb) {
+    const k = key(`expenses:${tripId}`);
+    const emit = () =>
+      cb([...read<Expense[]>(k, [])].sort((a, b) => b.createdAt - a.createdAt));
+    emit();
+    return subscribe(k, emit);
+  },
+
+  async addExpense(tripId, expense) {
+    const k = key(`expenses:${tripId}`);
+    const list = read<Expense[]>(k, []);
+    const full: Expense = {
+      ...expense,
+      id: randomId("exp"),
+      createdAt: Date.now(),
+    };
+    write(k, [full, ...list]);
+  },
+
+  async updateExpense(tripId, expenseId, patch) {
+    const k = key(`expenses:${tripId}`);
+    const list = read<Expense[]>(k, []);
+    write(
+      k,
+      list.map((e) =>
+        e.id === expenseId
+          ? {
+              ...e,
+              label: patch.label,
+              amount: patch.amount,
+              paidBy: patch.paidBy,
+              participants: patch.participants,
+            }
+          : e
+      )
+    );
+  },
+
+  async deleteExpense(tripId, expenseId) {
+    const k = key(`expenses:${tripId}`);
+    const list = read<Expense[]>(k, []);
+    write(
+      k,
+      list.filter((e) => e.id !== expenseId)
     );
   },
 };
