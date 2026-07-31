@@ -4,13 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { ITEM_TYPE_LIST, suggestBookingUrl } from "@/lib/items";
-import { AVAILABILITY_WINDOW } from "@/config/appConfig";
 import { randomId } from "@/lib/crypto";
 import type { ItemType, ProposalItem } from "@/lib/db";
 import { cn } from "@/lib/utils";
-
-const MIN_DT = `${AVAILABILITY_WINDOW.start}T00:00`;
-const MAX_DT = `${AVAILABILITY_WINDOW.end}T23:59`;
 
 const emptyDraft = () => ({
   type: "activity" as ItemType,
@@ -28,13 +24,17 @@ const emptyDraft = () => ({
 /** Compact builder for a single trip element; calls onAdd then resets. */
 export function ItemForm({
   destinationName,
+  range,
   onAdd,
 }: {
   destinationName: string;
+  range: { start: string; end: string };
   onAdd: (item: ProposalItem) => void;
 }) {
   const [draft, setDraft] = useState(emptyDraft());
   const [bookingTouched, setBookingTouched] = useState(false);
+  const MIN_DT = `${range.start}T00:00`;
+  const MAX_DT = `${range.end}T23:59`;
 
   function set<K extends keyof ReturnType<typeof emptyDraft>>(
     key: K,

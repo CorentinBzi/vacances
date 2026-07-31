@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { Trophy, Users } from "lucide-react";
 import { MonthCalendar, DayNumber } from "./MonthCalendar";
-import { AVAILABILITY_WINDOW } from "@/config/appConfig";
 import {
   computeDayStats,
   enumerateDays,
@@ -23,10 +22,16 @@ function heatClass(availableCount: number, submitted: number): string {
   return "bg-coral/25 text-coral";
 }
 
-export function AvailabilityHeatmap({ rows }: { rows: AvailabilityRow[] }) {
+export function AvailabilityHeatmap({
+  rows,
+  range,
+}: {
+  rows: AvailabilityRow[];
+  range: { start: string; end: string };
+}) {
   const days = useMemo(
-    () => enumerateDays(AVAILABILITY_WINDOW.start, AVAILABILITY_WINDOW.end),
-    []
+    () => enumerateDays(range.start, range.end),
+    [range.start, range.end]
   );
   const months = useMemo(() => groupIntoMonths(days), [days]);
   const { stats, submittedCount } = useMemo(

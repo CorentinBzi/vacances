@@ -2,26 +2,27 @@ import { useMemo, useState } from "react";
 import { CalendarX2, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MonthCalendar, DayNumber } from "./MonthCalendar";
-import { AVAILABILITY_WINDOW } from "@/config/appConfig";
 import { enumerateDays, groupIntoMonths } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
 /**
- * Lets a user mark the days they are NOT available during the window.
+ * Lets a user mark the days they are NOT available during the trip's window.
  * Click a day to toggle it. Everything not marked is treated as available.
  */
 export function AvailabilityPicker({
   initial = [],
   saving = false,
+  range,
   onSubmit,
 }: {
   initial?: string[];
   saving?: boolean;
+  range: { start: string; end: string };
   onSubmit: (unavailableDates: string[]) => void;
 }) {
   const days = useMemo(
-    () => enumerateDays(AVAILABILITY_WINDOW.start, AVAILABILITY_WINDOW.end),
-    []
+    () => enumerateDays(range.start, range.end),
+    [range.start, range.end]
   );
   const months = useMemo(() => groupIntoMonths(days), [days]);
   const [unavailable, setUnavailable] = useState<Set<string>>(

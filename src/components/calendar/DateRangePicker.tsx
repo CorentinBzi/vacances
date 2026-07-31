@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { CalendarRange, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { AVAILABILITY_WINDOW } from "@/config/appConfig";
 import {
   enumerateDays,
   formatDayNumber,
@@ -11,25 +10,24 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Glassy start→end date picker constrained to the planning window.
+ * Glassy start→end date picker constrained to the given planning window.
  * Selected endpoints get the coral→gold "sunset" pill; nights in between glow
  * azure. Replaces the OS-native date inputs so the calendar matches the app.
  */
 export function DateRangePicker({
   start,
   end,
+  range,
   onChange,
 }: {
   start?: string;
   end?: string;
+  range: { start: string; end: string };
   onChange: (start?: string, end?: string) => void;
 }) {
   const months = useMemo(
-    () =>
-      groupIntoMonths(
-        enumerateDays(AVAILABILITY_WINDOW.start, AVAILABILITY_WINDOW.end)
-      ),
-    []
+    () => groupIntoMonths(enumerateDays(range.start, range.end)),
+    [range.start, range.end]
   );
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(() => {
@@ -37,7 +35,12 @@ export function DateRangePicker({
     return i >= 0 ? i : 0;
   });
 
-  const month = months[index];
+  // The window (and thus `months`) can shrink after mount — e.g. the trip's
+  // real window arrives from Firestore after the picker already mounted with the
+  // default fallback. Clamp so a now-out-of-range index never leaves `month`
+  // undefined (which would silently prevent the popover from opening).
+  const safeIndex = Math.min(index, months.length - 1);
+  const month = months[safeIndex];
   const nights =
     start && end
       ? Math.round(
@@ -81,8 +84,9 @@ export function DateRangePicker({
     <div className="relative">
       <button
         type="button"
+        disabled={months.length === 0}
         onClick={() => setOpen((v) => !v)}
-        className="flex h-11 w-full items-center gap-2 rounded-xl border border-linen bg-white/90 px-4 text-left text-sm text-ink shadow-sm transition hover:border-azure"
+        className="flex h-11 w-full items-center gap-2 rounded-xl border border-linen bg-white/90 px-4 text-left text-sm text-ink shadow-sm transition hover:border-azure disabled:opacity-50"
       >
         <CalendarRange className="h-4 w-4 text-azure" />
         <span className={cn(!start && "text-ink-soft/60")}>{label}</span>
@@ -97,7 +101,7 @@ export function DateRangePicker({
         )}
       </button>
 
-      {open && (
+      {open && month && (
         <div className="absolute left-0 top-[3.25rem] z-40 w-[320px] rounded-3xl border border-linen bg-white/95 p-4 shadow-2xl shadow-azure/10 backdrop-blur-xl">
           <div className="mb-3 flex items-center justify-between">
             <p className="font-display text-lg font-bold text-ink">
@@ -111,17 +115,17 @@ export function DateRangePicker({
               )}
               <button
                 type="button"
-                disabled={index === 0}
-                onClick={() => setIndex((i) => Math.max(0, i - 1))}
+                disabled={safeIndex === 0}
+                onClick={() => setIndex(Math.max(0, safeIndex - 1))}
                 className="grid h-7 w-7 place-items-center rounded-full border border-linen text-ink-soft transition hover:border-azure disabled:opacity-30"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <button
                 type="button"
-                disabled={index === months.length - 1}
+                disabled={safeIndex === months.length - 1}
                 onClick={() =>
-                  setIndex((i) => Math.min(months.length - 1, i + 1))
+                  setIndex(Math.min(months.length - 1, safeIndex + 1))
                 }
                 className="grid h-7 w-7 place-items-center rounded-full border border-linen text-ink-soft transition hover:border-azure disabled:opacity-30"
               >

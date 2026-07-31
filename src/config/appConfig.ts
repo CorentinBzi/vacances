@@ -27,11 +27,30 @@ export const DEFAULT_TRIP = {
   name: "Dream Vacation 2026",
 } as const;
 
-// Planning window: mid-October to end of December 2026 (inclusive).
+// Default planning window (mid-October to end of December 2026, inclusive).
+// Used for the default trip and as the fallback for trips without their own.
 export const AVAILABILITY_WINDOW = {
   start: "2026-10-15",
   end: "2026-12-31",
 } as const;
+
+// Guard rail: a trip's chosen window can't be longer than this (keeps the
+// availability calendars and day-stat computations reasonable).
+export const MAX_WINDOW_DAYS = 366;
+
+/**
+ * Effective planning window for a trip. Falls back to AVAILABILITY_WINDOW when
+ * the trip has no window of its own (legacy trips / not-yet-loaded). Takes a
+ * structural param (not the Trip type) to avoid an import cycle with lib/db.
+ */
+export function tripWindow(
+  trip?: { windowStart?: string; windowEnd?: string } | null
+): { start: string; end: string } {
+  return {
+    start: trip?.windowStart ?? AVAILABILITY_WINDOW.start,
+    end: trip?.windowEnd ?? AVAILABILITY_WINDOW.end,
+  };
+}
 
 // URL of the Cloudflare Worker that proxies Gemini (activity suggestions).
 // NOT a secret — just the Worker endpoint. Empty until deployed; the AI

@@ -2,7 +2,22 @@
 // historical archive (no API key). Since the trip is in the future, we sample a
 // representative recent year (same calendar days) to estimate typical weather.
 
+import { AVAILABILITY_WINDOW } from "@/config/appConfig";
+
 const REPRESENTATIVE_YEAR = 2023;
+
+// Fallback sample window (month/day only — the year is remapped to
+// REPRESENTATIVE_YEAR below). Used solely when a proposal carries no dates of
+// its own; a ~7-day span early in the default availability window keeps the
+// estimate representative without hard-coding a magic date.
+const FALLBACK_SAMPLE_DAYS = 7;
+const FALLBACK_START = AVAILABILITY_WINDOW.start;
+const FALLBACK_END = new Date(
+  new Date(`${FALLBACK_START}T00:00:00Z`).getTime() +
+    FALLBACK_SAMPLE_DAYS * 86_400_000
+)
+  .toISOString()
+  .slice(0, 10);
 
 export interface WeatherEstimate {
   tempMax: number;
@@ -69,8 +84,8 @@ export async function getWeatherEstimate(
   startISO?: string,
   endISO?: string
 ): Promise<WeatherEstimate | null> {
-  const start = mapYear(startISO ?? "2026-11-10", REPRESENTATIVE_YEAR);
-  const end = mapYear(endISO ?? startISO ?? "2026-11-17", REPRESENTATIVE_YEAR);
+  const start = mapYear(startISO ?? FALLBACK_START, REPRESENTATIVE_YEAR);
+  const end = mapYear(endISO ?? startISO ?? FALLBACK_END, REPRESENTATIVE_YEAR);
   const key = `${lat.toFixed(2)},${lon.toFixed(2)},${start},${end}`;
   if (cache.has(key)) return cache.get(key)!;
 

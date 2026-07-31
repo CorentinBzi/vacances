@@ -17,6 +17,8 @@ import { AvailabilityHeatmap } from "@/components/calendar/AvailabilityHeatmap";
 import { ProposalCard } from "@/components/ProposalCard";
 import { PrivateTripGate } from "@/components/PrivateTripGate";
 import { useAuth } from "@/context/AuthContext";
+import { tripWindow } from "@/config/appConfig";
+import { formatMonthRange } from "@/lib/dates";
 import { db, type Availability, type Proposal, type Trip } from "@/lib/db";
 
 export function TripPage() {
@@ -25,6 +27,7 @@ export function TripPage() {
   const userName = user?.name ?? "";
 
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [tripsLoaded, setTripsLoaded] = useState(false);
   const [rows, setRows] = useState<Availability[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [myAvail, setMyAvail] = useState<Availability | null>(null);
@@ -32,7 +35,14 @@ export function TripPage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => db.subscribeTrips(setTrips), []);
+  useEffect(
+    () =>
+      db.subscribeTrips((list) => {
+        setTrips(list);
+        setTripsLoaded(true);
+      }),
+    []
+  );
   useEffect(() => db.subscribeAvailability(tripId, setRows), [tripId]);
   useEffect(() => db.subscribeProposals(tripId, setProposals), [tripId]);
 
@@ -53,6 +63,7 @@ export function TripPage() {
     () => trips.find((t) => t.id === tripId),
     [trips, tripId]
   );
+  const range = tripWindow(trip);
 
   async function saveAvailability(dates: string[]) {
     setSaving(true);
@@ -95,7 +106,10 @@ export function TripPage() {
     return <PrivateTripGate tripId={tripId} />;
   }
 
-  if (!loadedMine) {
+  // Wait for trips too: `range` derives from the trip, and rendering the
+  // availability UI before it loads would flash the default fallback window for
+  // custom-window trips.
+  if (!loadedMine || !tripsLoaded) {
     return (
       <AppLayout>
         <div className="animate-pulse py-20 text-center text-ink-soft">
@@ -157,14 +171,15 @@ export function TripPage() {
                 Tes indisponibilités
               </h2>
               <p className="text-sm text-ink-soft">
-                Mi-octobre → fin décembre 2026. Marque les jours où tu ne peux
-                pas, on en déduit les meilleures dates pour tous.
+                {formatMonthRange(range.start, range.end)}. Marque les jours où
+                tu ne peux pas, on en déduit les meilleures dates pour tous.
               </p>
             </div>
           </div>
           <AvailabilityPicker
             initial={myAvail?.unavailableDates ?? []}
             saving={saving}
+            range={range}
             onSubmit={saveAvailability}
           />
         </motion.section>
@@ -178,7 +193,7 @@ export function TripPage() {
                 Calendrier des disponibilités
               </h2>
             </div>
-            <AvailabilityHeatmap rows={heatmapRows} />
+            <AvailabilityHeatmap rows={heatmapRows} range={range} />
           </section>
 
           {/* Proposals */}

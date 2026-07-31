@@ -18,6 +18,10 @@ export interface Trip {
   createdAt: number;
   /** Share token — only holders (or admin) can see the trip. */
   token?: string;
+  /** Planning window start (YYYY-MM-DD). Falls back to AVAILABILITY_WINDOW when absent. */
+  windowStart?: string;
+  /** Planning window end (YYYY-MM-DD). */
+  windowEnd?: string;
 }
 
 export interface Availability {
@@ -113,7 +117,12 @@ export interface Database {
 
   // Trips
   subscribeTrips(cb: (trips: Trip[]) => void): Unsubscribe;
-  createTrip(name: string, createdBy: string): Promise<Trip>;
+  createTrip(
+    name: string,
+    createdBy: string,
+    windowStart: string,
+    windowEnd: string
+  ): Promise<Trip>;
   findTripByToken(token: string): Promise<Trip | null>;
 
   // Availability

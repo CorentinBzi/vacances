@@ -8,10 +8,53 @@ const MONTH_LABELS = [
   "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
 ];
 
+const MONTH_LABELS_SHORT = [
+  "Jan", "Fév", "Mar", "Avr", "Mai", "Juin",
+  "Juil", "Août", "Sep", "Oct", "Nov", "Déc",
+];
+
 export const WEEKDAY_LABELS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
 function parse(iso: string): Date {
   return new Date(iso + "T00:00:00Z");
+}
+
+/** "Octobre 2026" from an ISO date. */
+export function formatMonth(iso: string): string {
+  const d = parse(iso);
+  return `${MONTH_LABELS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
+
+/** "Juillet 2026" when both ends share a month, else "Octobre 2026 → Décembre 2026". */
+export function formatMonthRange(startISO: string, endISO: string): string {
+  const s = parse(startISO);
+  const e = parse(endISO);
+  const sameMonth =
+    s.getUTCFullYear() === e.getUTCFullYear() &&
+    s.getUTCMonth() === e.getUTCMonth();
+  return sameMonth
+    ? formatMonth(startISO)
+    : `${formatMonth(startISO)} → ${formatMonth(endISO)}`;
+}
+
+/** Compact window label: "Oct – Déc 2026", "Juil 2026" (same month), or
+ *  "Déc 2026 – Jan 2027" across years. */
+export function formatWindowShort(startISO: string, endISO: string): string {
+  const s = parse(startISO);
+  const e = parse(endISO);
+  const sy = s.getUTCFullYear();
+  const ey = e.getUTCFullYear();
+  const sm = MONTH_LABELS_SHORT[s.getUTCMonth()];
+  const em = MONTH_LABELS_SHORT[e.getUTCMonth()];
+  if (sy === ey) {
+    return sm === em ? `${sm} ${ey}` : `${sm} – ${em} ${ey}`;
+  }
+  return `${sm} ${sy} – ${em} ${ey}`;
+}
+
+/** Whole-number days between two ISO dates (end - start). Negative if inverted. */
+export function daysBetween(startISO: string, endISO: string): number {
+  return Math.round((parse(endISO).getTime() - parse(startISO).getTime()) / MS_PER_DAY);
 }
 
 /** Inclusive list of ISO days between two ISO dates. */

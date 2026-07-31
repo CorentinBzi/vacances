@@ -15,7 +15,13 @@ const AUTOPLAY_MS = 5000;
 
 /** AI-free "generated" slideshow: real destination photos + itinerary
  *  highlights, animated in the style of the showcase card. */
-export function DestinationSlideshow({ proposal }: { proposal: Proposal }) {
+export function DestinationSlideshow({
+  proposal,
+  windowLabel,
+}: {
+  proposal: Proposal;
+  windowLabel?: string;
+}) {
   const [images, setImages] = useState<DestinationImage[] | null>(null);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -43,7 +49,7 @@ export function DestinationSlideshow({ proposal }: { proposal: Proposal }) {
         ? `${formatLongDate(proposal.startDate)} → ${formatLongDate(proposal.endDate)}`
         : proposal.startDate
           ? formatLongDate(proposal.startDate)
-          : "Oct – Déc 2026";
+          : (windowLabel ?? "Oct – Déc 2026");
 
     const imgs = images ?? [];
     const base: Slide[] = [
@@ -64,7 +70,7 @@ export function DestinationSlideshow({ proposal }: { proposal: Proposal }) {
       });
     }
     return base;
-  }, [images, proposal, dest]);
+  }, [images, proposal, dest, windowLabel]);
 
   useEffect(() => {
     if (paused || slides.length <= 1) return;

@@ -1,4 +1,9 @@
-import { DEFAULT_TRIP, type Role, type UserName } from "@/config/appConfig";
+import {
+  AVAILABILITY_WINDOW,
+  DEFAULT_TRIP,
+  type Role,
+  type UserName,
+} from "@/config/appConfig";
 import { genToken, randomId } from "@/lib/crypto";
 import type {
   Availability,
@@ -61,6 +66,8 @@ function seed(): void {
         name: DEFAULT_TRIP.name,
         createdBy: "system",
         createdAt: Date.now(),
+        windowStart: AVAILABILITY_WINDOW.start,
+        windowEnd: AVAILABILITY_WINDOW.end,
       },
     ]);
   }
@@ -125,7 +132,7 @@ export const localDb: Database = {
     return subscribe(k, emit);
   },
 
-  async createTrip(name, createdBy) {
+  async createTrip(name, createdBy, windowStart, windowEnd) {
     const k = key("trips");
     const trips = read<Trip[]>(k, []);
     const trip: Trip = {
@@ -134,6 +141,8 @@ export const localDb: Database = {
       createdBy,
       createdAt: Date.now(),
       token: genToken(),
+      windowStart,
+      windowEnd,
     };
     write(k, [...trips, trip]);
     return trip;

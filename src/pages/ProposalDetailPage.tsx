@@ -18,9 +18,9 @@ import { CommentsPanel } from "@/components/CommentsPanel";
 import { WeatherBadge } from "@/components/WeatherBadge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { isAdmin } from "@/config/appConfig";
-import { db, type Proposal } from "@/lib/db";
-import { formatLongDate } from "@/lib/dates";
+import { isAdmin, tripWindow } from "@/config/appConfig";
+import { db, type Proposal, type Trip } from "@/lib/db";
+import { formatLongDate, formatWindowShort } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
 export function ProposalDetailPage() {
@@ -29,9 +29,16 @@ export function ProposalDetailPage() {
   const navigate = useNavigate();
   const userName = user?.name ?? "";
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => db.subscribeTrips(setTrips), []);
+  const windowLabel = useMemo(() => {
+    const w = tripWindow(trips.find((t) => t.id === tripId));
+    return formatWindowShort(w.start, w.end);
+  }, [trips, tripId]);
 
   async function handleDelete() {
     setDeleting(true);
@@ -188,7 +195,7 @@ export function ProposalDetailPage() {
           animate={{ opacity: 1, x: 0 }}
           className="lg:sticky lg:top-24 lg:self-start"
         >
-          <DestinationSlideshow proposal={proposal} />
+          <DestinationSlideshow proposal={proposal} windowLabel={windowLabel} />
         </motion.aside>
       </div>
 

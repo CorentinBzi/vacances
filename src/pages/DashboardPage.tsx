@@ -16,8 +16,15 @@ import { TripTokenBar } from "@/components/TripTokenBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
-import { isAdmin, DEFAULT_TRIP } from "@/config/appConfig";
+import {
+  isAdmin,
+  DEFAULT_TRIP,
+  AVAILABILITY_WINDOW,
+  MAX_WINDOW_DAYS,
+  tripWindow,
+} from "@/config/appConfig";
 import { canonicalToken } from "@/lib/crypto";
+import { formatWindowShort, daysBetween } from "@/lib/dates";
 import { db, type Trip } from "@/lib/db";
 
 export function DashboardPage() {
@@ -25,6 +32,9 @@ export function DashboardPage() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
+  const [winStart, setWinStart] = useState<string>(AVAILABILITY_WINDOW.start);
+  const [winEnd, setWinEnd] = useState<string>(AVAILABILITY_WINDOW.end);
+  const [createError, setCreateError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [tokenInput, setTokenInput] = useState("");
   const [joinMsg, setJoinMsg] = useState<{ ok: boolean; text: string } | null>(
@@ -39,13 +49,43 @@ export function DashboardPage() {
     [trips, canSeeTrip]
   );
 
+  function resetCreateForm() {
+    setNewName("");
+    setWinStart(AVAILABILITY_WINDOW.start);
+    setWinEnd(AVAILABILITY_WINDOW.end);
+    setCreateError(null);
+  }
+
+  function openCreate() {
+    resetCreateForm();
+    setCreating(true);
+  }
+
+  function cancelCreate() {
+    resetCreateForm();
+    setCreating(false);
+  }
+
   async function createTrip() {
     const name = newName.trim();
     if (!name || !user) return;
+    setCreateError(null);
+    if (!winStart || !winEnd) {
+      setCreateError("Choisis une date de début et de fin.");
+      return;
+    }
+    if (winEnd < winStart) {
+      setCreateError("La date de fin doit suivre la date de début.");
+      return;
+    }
+    if (daysBetween(winStart, winEnd) > MAX_WINDOW_DAYS) {
+      setCreateError("La période est trop longue (1 an maximum).");
+      return;
+    }
     setSaving(true);
     try {
-      await db.createTrip(name, user.name);
-      setNewName("");
+      await db.createTrip(name, user.name, winStart, winEnd);
+      resetCreateForm();
       setCreating(false);
     } finally {
       setSaving(false);
@@ -95,28 +135,73 @@ export function DashboardPage() {
             </p>
           </div>
           {admin && !creating && (
-            <Button onClick={() => setCreating(true)}>
+            <Button onClick={openCreate}>
               <Plus className="h-4 w-4" /> Nouveau voyage
             </Button>
           )}
         </div>
 
         {admin && creating && (
-          <div className="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-linen bg-white/70 p-4 backdrop-blur">
-            <Input
-              autoFocus
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && createTrip()}
-              placeholder="Nom du voyage (ex. Roadtrip Italie)"
-              className="max-w-xs"
-            />
-            <Button onClick={createTrip} disabled={saving || !newName.trim()}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Créer"}
-            </Button>
-            <Button variant="ghost" onClick={() => setCreating(false)}>
-              <X className="h-4 w-4" /> Annuler
-            </Button>
+          <div className="mt-6 rounded-2xl border border-linen bg-white/70 p-4 backdrop-blur">
+            <div className="flex flex-wrap items-end gap-3">
+              <label className="block">
+                <span className="mb-1 block text-xs font-medium text-ink-soft">
+                  Nom du voyage
+                </span>
+                <Input
+                  autoFocus
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") createTrip();
+                  }}
+                  placeholder="Ex. Roadtrip Italie"
+                  className="w-56"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs font-medium text-ink-soft">
+                  Du
+                </span>
+                <Input
+                  type="date"
+                  value={winStart}
+                  onChange={(e) => {
+                    setWinStart(e.target.value);
+                    setCreateError(null);
+                  }}
+                  className="w-40"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs font-medium text-ink-soft">
+                  Au
+                </span>
+                <Input
+                  type="date"
+                  value={winEnd}
+                  min={winStart}
+                  onChange={(e) => {
+                    setWinEnd(e.target.value);
+                    setCreateError(null);
+                  }}
+                  className="w-40"
+                />
+              </label>
+              <Button onClick={createTrip} disabled={saving || !newName.trim()}>
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Créer"}
+              </Button>
+              <Button variant="ghost" onClick={cancelCreate}>
+                <X className="h-4 w-4" /> Annuler
+              </Button>
+            </div>
+            {createError && (
+              <p className="mt-2 text-sm text-coral">{createError}</p>
+            )}
+            <p className="mt-2 text-xs text-ink-soft">
+              La fenêtre de dates sur laquelle la bande renseignera ses
+              disponibilités.
+            </p>
           </div>
         )}
 
@@ -170,8 +255,11 @@ export function DashboardPage() {
                   </div>
                   <div className="p-5">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-coral">
-                      <CalendarDays className="mr-1 inline h-3.5 w-3.5" /> Oct –
-                      Déc 2026
+                      <CalendarDays className="mr-1 inline h-3.5 w-3.5" />{" "}
+                      {formatWindowShort(
+                        tripWindow(trip).start,
+                        tripWindow(trip).end
+                      )}
                     </p>
                     <h3 className="mt-1.5 font-display text-xl font-bold text-ink group-hover:text-azure">
                       {trip.name}

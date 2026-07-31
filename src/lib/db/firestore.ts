@@ -16,7 +16,12 @@ import {
   getDocs,
   type Firestore,
 } from "firebase/firestore";
-import { DEFAULT_TRIP, type Role, type UserName } from "@/config/appConfig";
+import {
+  AVAILABILITY_WINDOW,
+  DEFAULT_TRIP,
+  type Role,
+  type UserName,
+} from "@/config/appConfig";
 import { genToken, randomId } from "@/lib/crypto";
 import type {
   Availability,
@@ -55,7 +60,22 @@ export function createFirestoreDb(db: Firestore): Database {
         name: DEFAULT_TRIP.name,
         createdBy: "system",
         createdAt: Date.now(),
+        windowStart: AVAILABILITY_WINDOW.start,
+        windowEnd: AVAILABILITY_WINDOW.end,
       });
+    } else {
+      // Backfill the window on a default trip created before this feature.
+      const data = snap.data();
+      if (data.windowStart === undefined || data.windowEnd === undefined) {
+        await setDoc(
+          ref,
+          {
+            windowStart: AVAILABILITY_WINDOW.start,
+            windowEnd: AVAILABILITY_WINDOW.end,
+          },
+          { merge: true }
+        );
+      }
     }
   }
 
@@ -108,7 +128,7 @@ export function createFirestoreDb(db: Firestore): Database {
       });
     },
 
-    async createTrip(name, createdBy) {
+    async createTrip(name, createdBy, windowStart, windowEnd) {
       const id = randomId("trip");
       const trip: Trip = {
         id,
@@ -116,12 +136,16 @@ export function createFirestoreDb(db: Firestore): Database {
         createdBy,
         createdAt: Date.now(),
         token: genToken(),
+        windowStart,
+        windowEnd,
       };
       await setDoc(doc(tripsCol, id), {
         name,
         createdBy,
         createdAt: trip.createdAt,
         token: trip.token,
+        windowStart,
+        windowEnd,
       });
       return trip;
     },

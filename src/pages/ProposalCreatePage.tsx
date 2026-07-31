@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Loader2, MapPinned, Trash2, Save, GripVertical } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
@@ -9,9 +9,9 @@ import { DateRangePicker } from "@/components/calendar/DateRangePicker";
 import { ItemForm } from "@/components/ItemForm";
 import { AiActivitySuggestions } from "@/components/AiActivitySuggestions";
 import { useAuth } from "@/context/AuthContext";
-import { isAdmin } from "@/config/appConfig";
+import { isAdmin, tripWindow } from "@/config/appConfig";
 import { ITEM_TYPES } from "@/lib/items";
-import { db, type Destination, type ProposalItem } from "@/lib/db";
+import { db, type Destination, type ProposalItem, type Trip } from "@/lib/db";
 import type { PlaceResult } from "@/lib/api/places";
 
 function sortItems(items: ProposalItem[]): ProposalItem[] {
@@ -36,7 +36,14 @@ export function ProposalCreatePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(!isEdit);
+  const [trips, setTrips] = useState<Trip[]>([]);
   const initedRef = useRef(false);
+
+  useEffect(() => db.subscribeTrips(setTrips), []);
+  const range = useMemo(
+    () => tripWindow(trips.find((t) => t.id === tripId)),
+    [trips, tripId]
+  );
 
   // Edit mode: load the existing proposal once, enforce ownership, pre-fill.
   useEffect(() => {
@@ -187,6 +194,7 @@ export function ProposalCreatePage() {
                 <DateRangePicker
                   start={startDate}
                   end={endDate}
+                  range={range}
                   onChange={(s, e) => {
                     setStartDate(s);
                     setEndDate(e);
@@ -209,6 +217,7 @@ export function ProposalCreatePage() {
             </h2>
             <ItemForm
               destinationName={destination?.name ?? ""}
+              range={range}
               onAdd={(item) => setItems((prev) => [...prev, item])}
             />
           </section>
