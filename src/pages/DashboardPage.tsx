@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarDays,
   Plus,
@@ -8,6 +9,7 @@ import {
   MapPin,
   KeyRound,
   Globe2,
+  Trash2,
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { DreamVacationIllustration } from "@/components/DreamVacationIllustration";
@@ -40,6 +42,8 @@ export function DashboardPage() {
   const [joinMsg, setJoinMsg] = useState<{ ok: boolean; text: string } | null>(
     null
   );
+  const [deleteTarget, setDeleteTarget] = useState<Trip | null>(null);
+  const [deletingTrip, setDeletingTrip] = useState(false);
   const admin = isAdmin(user?.name);
 
   useEffect(() => db.subscribeTrips(setTrips), []);
@@ -89,6 +93,19 @@ export function DashboardPage() {
       setCreating(false);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleDeleteTrip() {
+    if (!deleteTarget) return;
+    setDeletingTrip(true);
+    try {
+      await db.deleteTrip(deleteTarget.id);
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeletingTrip(false);
     }
   }
 
@@ -274,9 +291,20 @@ export function DashboardPage() {
                       <Globe2 className="h-3.5 w-3.5 text-azure" /> Public —
                       visible par tous
                     </div>
-                  ) : trip.token ? (
-                    <TripTokenBar token={trip.token} tripId={trip.id} />
-                  ) : null)}
+                  ) : (
+                    <>
+                      {trip.token && (
+                        <TripTokenBar token={trip.token} tripId={trip.id} />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTarget(trip)}
+                        className="flex items-center justify-center gap-1.5 border-t border-linen px-4 py-2.5 text-xs font-medium text-coral transition hover:bg-coral/5"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" /> Supprimer le voyage
+                      </button>
+                    </>
+                  ))}
               </div>
             );
           })}
@@ -289,6 +317,65 @@ export function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Delete-trip confirmation */}
+      <AnimatePresence>
+        {deleteTarget && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/30 p-4 backdrop-blur-sm"
+            onClick={() => !deletingTrip && setDeleteTarget(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm rounded-3xl border border-linen bg-white p-6 shadow-2xl"
+            >
+              <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-coral/10 text-coral">
+                <Trash2 className="h-6 w-6" />
+              </div>
+              <h3 className="text-center font-display text-xl font-bold text-ink">
+                Supprimer ce voyage&nbsp;?
+              </h3>
+              <p className="mt-1 text-center text-sm text-ink-soft">
+                « {deleteTarget.name} » et toutes ses données (disponibilités,
+                propositions, dépenses) seront définitivement supprimés pour tout
+                le monde. Cette action est irréversible.
+              </p>
+              <div className="mt-6 flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={deletingTrip}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  variant="danger"
+                  className="flex-1"
+                  onClick={handleDeleteTrip}
+                  disabled={deletingTrip}
+                >
+                  {deletingTrip ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" /> Suppression…
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4" /> Supprimer
+                    </>
+                  )}
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AppLayout>
   );
 }

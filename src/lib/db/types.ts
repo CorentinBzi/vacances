@@ -123,6 +123,8 @@ export interface Database {
     windowStart: string,
     windowEnd: string
   ): Promise<Trip>;
+  /** Permanently remove a trip and all of its associated data. */
+  deleteTrip(tripId: string): Promise<void>;
   findTripByToken(token: string): Promise<Trip | null>;
 
   // Availability

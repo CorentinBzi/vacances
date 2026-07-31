@@ -150,6 +150,17 @@ export function createFirestoreDb(db: Firestore): Database {
       return trip;
     },
 
+    async deleteTrip(tripId) {
+      // Firestore does not cascade-delete subcollections, so clear them first
+      // (availability, proposals, expenses) before removing the trip document.
+      const subcols = [availCol(tripId), propsCol(tripId), expCol(tripId)];
+      for (const col of subcols) {
+        const snap = await getDocs(col);
+        await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+      }
+      await deleteDoc(doc(tripsCol, tripId));
+    },
+
     async findTripByToken(token) {
       const snap = await getDocs(
         query(tripsCol, where("token", "==", token), limit(1))

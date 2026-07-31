@@ -148,6 +148,24 @@ export const localDb: Database = {
     return trip;
   },
 
+  async deleteTrip(tripId) {
+    const k = key("trips");
+    const trips = read<Trip[]>(k, []);
+    write(
+      k,
+      trips.filter((t) => t.id !== tripId)
+    );
+    // Drop the trip's associated data too.
+    for (const suffix of [
+      `availability:${tripId}`,
+      `proposals:${tripId}`,
+      `expenses:${tripId}`,
+    ]) {
+      localStorage.removeItem(key(suffix));
+      notify(key(suffix));
+    }
+  },
+
   async findTripByToken(token) {
     const trips = read<Trip[]>(key("trips"), []);
     return trips.find((t) => t.token === token) ?? null;
