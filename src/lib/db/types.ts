@@ -7,6 +7,8 @@ export interface UserRecord {
   passwordHash: string | null;
   /** Guests must change their password on first login; admin never does. */
   hasCustomPassword: boolean;
+  /** Trip ids the user has unlocked with a share token. */
+  unlockedTrips?: string[];
 }
 
 export interface Trip {
@@ -14,6 +16,8 @@ export interface Trip {
   name: string;
   createdBy: string;
   createdAt: number;
+  /** Share token — only holders (or admin) can see the trip. */
+  token?: string;
 }
 
 export interface Availability {
@@ -101,10 +105,16 @@ export interface Database {
   getUser(name: UserName): Promise<UserRecord | null>;
   ensureUser(name: UserName, role: Role): Promise<UserRecord>;
   setUserPassword(name: UserName, passwordHash: string): Promise<void>;
+  subscribeUser(
+    name: UserName,
+    cb: (record: UserRecord | null) => void
+  ): Unsubscribe;
+  unlockTrip(name: UserName, tripId: string): Promise<void>;
 
   // Trips
   subscribeTrips(cb: (trips: Trip[]) => void): Unsubscribe;
   createTrip(name: string, createdBy: string): Promise<Trip>;
+  findTripByToken(token: string): Promise<Trip | null>;
 
   // Availability
   subscribeAvailability(

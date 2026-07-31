@@ -9,6 +9,7 @@ import {
 import {
   ADMIN_NAME,
   ADMIN_PASSWORD_HASH,
+  DEFAULT_TRIP,
   GUEST_PASSWORD_HASH,
   isGuestName,
   type GuestName,
@@ -37,10 +38,18 @@ interface AuthContextValue {
   user: AuthUser | null;
   onboarding: Onboarding | null;
   ready: boolean;
+  /** Trip ids this user has unlocked with a share token. */
+  unlockedTrips: string[];
+  /** True once the unlocked-trips list has loaded (avoids access flicker). */
+  accessReady: boolean;
   login: (username: string, password: string) => Promise<LoginResult>;
   selectGuestName: (name: GuestName) => Promise<void>;
   changePassword: (newPassword: string) => Promise<void>;
   logout: () => void;
+  /** Whether the current user may see a given trip. */
+  canSeeTrip: (tripId: string) => boolean;
+  /** Persist that the user unlocked a trip (adds it to their list). */
+  unlockTrip: (tripId: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -52,6 +61,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [onboarding, setOnboarding] = useState<Onboarding | null>(null);
   const [ready, setReady] = useState(false);
+  const [unlockedTrips, setUnlockedTrips] = useState<string[]>([]);
+  const [accessReady, setAccessReady] = useState(true);
+
+  // Keep the user's unlocked-trips list live from their record.
+  useEffect(() => {
+    if (!user) {
+      setUnlockedTrips([]);
+      setAccessReady(true);
+      return;
+    }
+    setAccessReady(false);
+    return db.subscribeUser(user.name, (record) => {
+      setUnlockedTrips(record?.unlockedTrips ?? []);
+      setAccessReady(true);
+    });
+  }, [user?.name]);
+
+  function canSeeTrip(tripId: string): boolean {
+    if (!user) return false;
+    if (user.role === "admin") return true;
+    if (tripId === DEFAULT_TRIP.id) return true; // default trip stays public
+    return unlockedTrips.includes(tripId);
+  }
+
+  async function unlockTrip(tripId: string): Promise<void> {
+    if (!user) return;
+    await db.unlockTrip(user.name, tripId);
+    setUnlockedTrips((prev) =>
+      prev.includes(tripId) ? prev : [...prev, tripId]
+    );
+  }
 
   // Restore any persisted session on load.
   useEffect(() => {
@@ -134,13 +174,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       onboarding,
       ready,
+      unlockedTrips,
+      accessReady,
       login,
       selectGuestName,
       changePassword,
       logout,
+      canSeeTrip,
+      unlockTrip,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, onboarding, ready]
+    [user, onboarding, ready, unlockedTrips, accessReady]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,5 +1,5 @@
 import { DEFAULT_TRIP, type Role, type UserName } from "@/config/appConfig";
-import { randomId } from "@/lib/crypto";
+import { genToken, randomId } from "@/lib/crypto";
 import type {
   Availability,
   Comment,
@@ -82,6 +82,7 @@ export const localDb: Database = {
         role,
         passwordHash: null,
         hasCustomPassword: false,
+        unlockedTrips: [],
       };
       write(key("users"), { ...users, [name]: record });
       return record;
@@ -97,6 +98,23 @@ export const localDb: Database = {
       ...users,
       [name]: { ...existing, passwordHash, hasCustomPassword: true },
     });
+  },
+
+  subscribeUser(name, cb) {
+    const k = key("users");
+    const emit = () =>
+      cb(read<Record<string, UserRecord>>(k, {})[name] ?? null);
+    emit();
+    return subscribe(k, emit);
+  },
+
+  async unlockTrip(name, tripId) {
+    const users = read<Record<string, UserRecord>>(key("users"), {});
+    const existing = users[name];
+    if (!existing) return;
+    const unlockedTrips = [...(existing.unlockedTrips ?? [])];
+    if (!unlockedTrips.includes(tripId)) unlockedTrips.push(tripId);
+    write(key("users"), { ...users, [name]: { ...existing, unlockedTrips } });
   },
 
   subscribeTrips(cb) {
@@ -115,9 +133,15 @@ export const localDb: Database = {
       name,
       createdBy,
       createdAt: Date.now(),
+      token: genToken(),
     };
     write(k, [...trips, trip]);
     return trip;
+  },
+
+  async findTripByToken(token) {
+    const trips = read<Trip[]>(key("trips"), []);
+    return trips.find((t) => t.token === token) ?? null;
   },
 
   subscribeAvailability(tripId, cb) {

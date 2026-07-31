@@ -15,12 +15,13 @@ import { Button } from "@/components/ui/button";
 import { AvailabilityPicker } from "@/components/calendar/AvailabilityPicker";
 import { AvailabilityHeatmap } from "@/components/calendar/AvailabilityHeatmap";
 import { ProposalCard } from "@/components/ProposalCard";
+import { PrivateTripGate } from "@/components/PrivateTripGate";
 import { useAuth } from "@/context/AuthContext";
 import { db, type Availability, type Proposal, type Trip } from "@/lib/db";
 
 export function TripPage() {
   const { tripId = "" } = useParams();
-  const { user } = useAuth();
+  const { user, canSeeTrip, accessReady } = useAuth();
   const userName = user?.name ?? "";
 
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -79,10 +80,25 @@ export function TripPage() {
     return [...map.values()];
   }, [rows, myAvail, userName]);
 
+  if (!accessReady) {
+    return (
+      <AppLayout>
+        <div className="animate-pulse py-20 text-center text-ink-soft">
+          Chargement…
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Token gate: private trips are only visible to holders (and admin).
+  if (!canSeeTrip(tripId)) {
+    return <PrivateTripGate tripId={tripId} />;
+  }
+
   if (!loadedMine) {
     return (
       <AppLayout>
-        <div className="animate-pulse py-20 text-center text-slate-400">
+        <div className="animate-pulse py-20 text-center text-ink-soft">
           Chargement du voyage…
         </div>
       </AppLayout>

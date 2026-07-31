@@ -11,10 +11,13 @@ import {
   setDoc,
   updateDoc,
   arrayUnion,
+  where,
+  limit,
+  getDocs,
   type Firestore,
 } from "firebase/firestore";
 import { DEFAULT_TRIP, type Role, type UserName } from "@/config/appConfig";
-import { randomId } from "@/lib/crypto";
+import { genToken, randomId } from "@/lib/crypto";
 import type {
   Availability,
   Comment,
@@ -73,6 +76,7 @@ export function createFirestoreDb(db: Firestore): Database {
         role,
         passwordHash: null,
         hasCustomPassword: false,
+        unlockedTrips: [],
       };
       await setDoc(ref, record);
       return record;
@@ -85,6 +89,18 @@ export function createFirestoreDb(db: Firestore): Database {
       });
     },
 
+    subscribeUser(name, cb) {
+      return onSnapshot(doc(db, "users", name), (snap) => {
+        cb(snap.exists() ? (snap.data() as UserRecord) : null);
+      });
+    },
+
+    async unlockTrip(name, tripId) {
+      await updateDoc(doc(db, "users", name), {
+        unlockedTrips: arrayUnion(tripId),
+      });
+    },
+
     subscribeTrips(cb) {
       void seedDefaultTrip();
       return onSnapshot(query(tripsCol, orderBy("createdAt", "asc")), (snap) => {
@@ -94,13 +110,28 @@ export function createFirestoreDb(db: Firestore): Database {
 
     async createTrip(name, createdBy) {
       const id = randomId("trip");
-      const trip: Trip = { id, name, createdBy, createdAt: Date.now() };
+      const trip: Trip = {
+        id,
+        name,
+        createdBy,
+        createdAt: Date.now(),
+        token: genToken(),
+      };
       await setDoc(doc(tripsCol, id), {
         name,
         createdBy,
         createdAt: trip.createdAt,
+        token: trip.token,
       });
       return trip;
+    },
+
+    async findTripByToken(token) {
+      const snap = await getDocs(
+        query(tripsCol, where("token", "==", token), limit(1))
+      );
+      const d = snap.docs[0];
+      return d ? ({ id: d.id, ...d.data() } as Trip) : null;
     },
 
     subscribeAvailability(tripId, cb) {

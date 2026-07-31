@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Plane, Lock, User, Loader2 } from "lucide-react";
 import { SkyBackdrop } from "@/components/SkyBackdrop";
 import { DreamVacationIllustration } from "@/components/DreamVacationIllustration";
@@ -13,6 +13,11 @@ import { LOGIN_POLAROIDS } from "@/data/polaroids";
 export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  // Return to the page the user was heading for (e.g. an invite /join link).
+  const fromPath =
+    (location.state as { from?: { pathname?: string } } | null)?.from
+      ?.pathname ?? "/";
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +33,7 @@ export function LoginPage() {
         setError(result.error);
         return;
       }
-      navigate(result.next === "select-name" ? "/select-name" : "/", {
+      navigate(result.next === "select-name" ? "/select-name" : fromPath, {
         replace: true,
       });
     } catch (err) {

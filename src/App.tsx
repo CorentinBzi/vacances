@@ -8,6 +8,7 @@ import { TripPage } from "@/pages/TripPage";
 import { ProposalCreatePage } from "@/pages/ProposalCreatePage";
 import { ProposalDetailPage } from "@/pages/ProposalDetailPage";
 import { ExpensesPage } from "@/pages/ExpensesPage";
+import { JoinPage } from "@/pages/JoinPage";
 
 function FullScreenLoader() {
   return (
@@ -62,6 +63,15 @@ export default function App() {
           ) : (
             <Navigate to={user ? "/" : "/login"} replace />
           )
+        }
+      />
+
+      <Route
+        path="/join/:token"
+        element={
+          <RequireAuth>
+            <JoinPage />
+          </RequireAuth>
         }
       />
 

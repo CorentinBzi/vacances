@@ -1,24 +1,43 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { CalendarDays, Plus, X, Loader2, MapPin } from "lucide-react";
+import {
+  CalendarDays,
+  Plus,
+  X,
+  Loader2,
+  MapPin,
+  KeyRound,
+  Globe2,
+} from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { DreamVacationIllustration } from "@/components/DreamVacationIllustration";
 import { GlobeWeather } from "@/components/ui/cobe-globe-weather";
+import { TripTokenBar } from "@/components/TripTokenBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
 import { isAdmin, DEFAULT_TRIP } from "@/config/appConfig";
+import { canonicalToken } from "@/lib/crypto";
 import { db, type Trip } from "@/lib/db";
 
 export function DashboardPage() {
-  const { user } = useAuth();
+  const { user, canSeeTrip, unlockTrip } = useAuth();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [tokenInput, setTokenInput] = useState("");
+  const [joinMsg, setJoinMsg] = useState<{ ok: boolean; text: string } | null>(
+    null
+  );
   const admin = isAdmin(user?.name);
 
   useEffect(() => db.subscribeTrips(setTrips), []);
+
+  const visibleTrips = useMemo(
+    () => trips.filter((t) => canSeeTrip(t.id)),
+    [trips, canSeeTrip]
+  );
 
   async function createTrip() {
     const name = newName.trim();
@@ -31,6 +50,23 @@ export function DashboardPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function joinByToken(e: FormEvent) {
+    e.preventDefault();
+    const canon = canonicalToken(tokenInput);
+    if (!canon) {
+      setJoinMsg({ ok: false, text: "Format de token invalide." });
+      return;
+    }
+    const match = trips.find((t) => t.token === canon);
+    if (!match) {
+      setJoinMsg({ ok: false, text: "Aucun voyage ne correspond à ce token." });
+      return;
+    }
+    await unlockTrip(match.id);
+    setTokenInput("");
+    setJoinMsg({ ok: true, text: `Voyage « ${match.name} » ajouté ✅` });
   }
 
   return (
@@ -84,42 +120,84 @@ export function DashboardPage() {
           </div>
         )}
 
+        {/* Join a trip with a token */}
+        <form
+          onSubmit={joinByToken}
+          className="mt-6 flex flex-wrap items-center gap-2 rounded-2xl border border-linen bg-white/70 p-3 backdrop-blur"
+        >
+          <span className="flex items-center gap-1.5 pl-1 text-sm font-medium text-ink-soft">
+            <KeyRound className="h-4 w-4 text-azure" /> Rejoindre un voyage
+          </span>
+          <Input
+            value={tokenInput}
+            onChange={(e) => {
+              setTokenInput(e.target.value);
+              setJoinMsg(null);
+            }}
+            placeholder="Token (ex. K7P2-9RMB)"
+            className="max-w-[12rem] font-mono uppercase tracking-wider"
+          />
+          <Button type="submit" variant="outline" disabled={!tokenInput.trim()}>
+            Rejoindre
+          </Button>
+          {joinMsg && (
+            <span
+              className={`text-sm ${joinMsg.ok ? "text-emerald-600" : "text-coral"}`}
+            >
+              {joinMsg.text}
+            </span>
+          )}
+        </form>
+
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {trips.map((trip, i) => {
+          {visibleTrips.map((trip, i) => {
             const isDefault = trip.id === DEFAULT_TRIP.id;
             return (
-              <Link
+              <div
                 key={trip.id}
-                to={`/trip/${trip.id}`}
                 className={`reveal reveal-${Math.min(i + 1, 4)} group flex flex-col overflow-hidden rounded-3xl border border-linen bg-card shadow-lg shadow-azure/5 transition-transform duration-300 hover:-translate-y-1`}
               >
-                <div className="relative h-36 overflow-hidden">
-                  {isDefault ? (
-                    <DreamVacationIllustration />
-                  ) : (
-                    <div className="relative h-full w-full bg-gradient-to-br from-azure via-[#3aa7db] to-gold">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_-20%,rgba(255,255,255,0.5),transparent_55%)]" />
-                      <MapPin className="absolute bottom-3 left-4 h-7 w-7 text-white drop-shadow" />
+                <Link to={`/trip/${trip.id}`} className="block">
+                  <div className="relative h-36 overflow-hidden">
+                    {isDefault ? (
+                      <DreamVacationIllustration />
+                    ) : (
+                      <div className="relative h-full w-full bg-gradient-to-br from-azure via-[#3aa7db] to-gold">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_-20%,rgba(255,255,255,0.5),transparent_55%)]" />
+                        <MapPin className="absolute bottom-3 left-4 h-7 w-7 text-white drop-shadow" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-coral">
+                      <CalendarDays className="mr-1 inline h-3.5 w-3.5" /> Oct –
+                      Déc 2026
+                    </p>
+                    <h3 className="mt-1.5 font-display text-xl font-bold text-ink group-hover:text-azure">
+                      {trip.name}
+                    </h3>
+                  </div>
+                </Link>
+
+                {/* Admin: token to share (or "public" for the default trip) */}
+                {admin &&
+                  (isDefault ? (
+                    <div className="flex items-center gap-1.5 border-t border-linen bg-azure/5 px-4 py-3 text-xs font-medium text-ink-soft">
+                      <Globe2 className="h-3.5 w-3.5 text-azure" /> Public —
+                      visible par tous
                     </div>
-                  )}
-                </div>
-                <div className="p-5">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-coral">
-                    <CalendarDays className="mr-1 inline h-3.5 w-3.5" /> Oct – Déc
-                    2026
-                  </p>
-                  <h3 className="mt-1.5 font-display text-xl font-bold text-ink group-hover:text-azure">
-                    {trip.name}
-                  </h3>
-                </div>
-              </Link>
+                  ) : trip.token ? (
+                    <TripTokenBar token={trip.token} tripId={trip.id} />
+                  ) : null)}
+              </div>
             );
           })}
         </div>
 
-        {trips.length === 0 && (
-          <div className="mt-10 rounded-2xl border border-dashed border-linen p-10 text-center text-ink-soft">
-            Aucun voyage pour l'instant.
+        {visibleTrips.length === 0 && (
+          <div className="mt-10 rounded-2xl border border-dashed border-linen bg-white/40 p-10 text-center text-ink-soft">
+            Aucun voyage visible. Entre un token ci-dessus pour rejoindre un
+            voyage 🔑
           </div>
         )}
       </div>
