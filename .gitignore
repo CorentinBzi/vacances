@@ -19,3 +19,6 @@ gemini-api-key.txt
 .env
 .env.*
 !.env.example
+
+# Claude Code: per-user permissions (may contain tokens) — never commit
+.claude/settings.local.json

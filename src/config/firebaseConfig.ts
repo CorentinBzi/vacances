@@ -1,14 +1,15 @@
 // Firebase configuration.
 //
-// The app runs on localStorage until you fill this in. Once you paste your real
-// Firebase project config here, the app automatically switches to Firestore and
-// data is shared in real time across everyone's devices.
+// The API key is NEVER written in this file (the repo is public): it comes from
+// VITE_FIREBASE_API_KEY — a GitHub Actions secret for the deployed site, or a
+// git-ignored .env.local for local development. Without it the app runs on
+// localStorage only. The other values identify the project and are not secrets.
 //
 // HOW TO GET THIS (see README.md "Activer le partage Firebase" for screenshots):
 //   1. https://console.firebase.google.com  ->  Add project (free "Spark" plan).
 //   2. Build > Firestore Database > Create database > Start in *production* mode.
 //   3. Project settings (gear) > "Your apps" > Web (</>) > register app.
-//   4. Copy the firebaseConfig values into the object below.
+//   4. Copy the firebaseConfig values (the apiKey goes into the secret, see above).
 //   5. Firestore > Rules: paste the rules from README.md, Publish.
 //
 // You can also provide these via .env (VITE_FIREBASE_*) instead of editing here.
@@ -19,7 +20,7 @@ const env = import.meta.env;
 // GitHub Actions injects when the optional VITE_FIREBASE_* secrets are unset —
 // fall back to the literal defaults below. `??` would keep the empty string.
 export const firebaseConfig = {
-  apiKey: env.VITE_FIREBASE_API_KEY || "AIzaSyB7Xc3Ymu7yqd_1eJnd9YLlkl6fl1_n5Ug",
+  apiKey: env.VITE_FIREBASE_API_KEY || "",
   authDomain:
     env.VITE_FIREBASE_AUTH_DOMAIN || "dream-vacation-2026.firebaseapp.com",
   projectId: env.VITE_FIREBASE_PROJECT_ID || "dream-vacation-2026",

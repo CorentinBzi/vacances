@@ -98,11 +98,16 @@ projet un jour). Elle branche **Firebase Firestore** (offre gratuite « Spark »
    Anonymous → Activer*. (Permet des règles sécurisées ci-dessous.)
 4. **Récupérer la config** — *Paramètres du projet (⚙️) → Vos applications →
    Web (`</>`)* → enregistrer l'app → copier l'objet `firebaseConfig`.
-5. **Brancher la config** — deux options :
-   - **Simple** : colle les valeurs dans
+5. **Brancher la config** — la **clé API** ne doit jamais être écrite dans le
+   code (le dépôt est public) : mets-la en *secret* GitHub
+   `VITE_FIREBASE_API_KEY`, et en local dans un `.env.local` (ignoré par git).
+   Restreins-la dans Google Cloud (*Identifiants* → la clé → référents
+   `https://corentinbzi.github.io/*` et API Identity Toolkit, Token Service,
+   Cloud Firestore). Les autres valeurs, qui identifient le projet, peuvent :
+   - **Simple** : être collées dans
      [`src/config/firebaseConfig.ts`](src/config/firebaseConfig.ts), commit &
      push.
-   - **Propre** (recommandé) : ajoute-les en *secrets* GitHub
+   - **Propre** : être ajoutées en *secrets* GitHub
      (*Settings → Secrets and variables → Actions*) sous les noms
      `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`,
      `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`,

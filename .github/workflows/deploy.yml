@@ -27,13 +27,24 @@ jobs:
 
       - run: npm ci
 
+      # The Firebase API key is no longer in the code: refuse to publish a site
+      # that would silently fall back to local-only mode if the secret is missing.
+      - name: Check Firebase API key secret
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+        run: |
+          if [ -z "$VITE_FIREBASE_API_KEY" ]; then
+            echo "::error::Secret VITE_FIREBASE_API_KEY manquant (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+
       - name: Build
         run: npm run build
         env:
           # Base path must match the repository name (site served at /<repo>/).
           VITE_BASE: /${{ github.event.repository.name }}/
-          # Firebase config (optional) — set these as repo secrets to enable
-          # shared data. Without them the app runs in local-only mode.
+          # Firebase config — the API key MUST be a repo secret; the other
+          # values fall back to the project identifiers in firebaseConfig.ts.
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
